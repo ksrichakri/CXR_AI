@@ -1,0 +1,48 @@
+﻿.root {
+    padding: 6px;
+    flex-direction: column;
+}
+
+.header {
+    -unity-font-style: bold;
+    margin-bottom: 6px;
+}
+
+.section {
+    -unity-font-style: bold;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+.row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.changes-list {
+    height: 140px;
+    border-width: 1px;
+    border-color: black;
+    padding: 2px;
+}
+
+.file-row {
+    flex-direction: row;
+    align-items: center;
+    height: 20px;
+    padding-left: 4px;
+}
+
+.file-toggle {
+    margin-right: 6px;
+}
+
+.file-status {
+    width: 30px;
+    color: gray;
+}
+
+.file-label {
+    flex-grow: 1;
+}

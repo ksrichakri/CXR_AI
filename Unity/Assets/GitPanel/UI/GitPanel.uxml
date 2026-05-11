@@ -1,0 +1,29 @@
+﻿<engine:UXML xmlns:engine="UnityEngine.UIElements">
+
+    <engine:VisualElement class="root">
+
+        <engine:Label text="Git Panel" class="header"/>
+
+        <engine:VisualElement class="row">
+            <engine:Label text="Branch:"/>
+            <engine:VisualElement name="branchContainer"/>
+        </engine:VisualElement>
+
+        <engine:Label text="Changes" class="section"/>
+        <engine:ScrollView name="changesList" class="changes-list"/>
+
+        <engine:Label text="Commit Message" class="section"/>
+        <engine:TextField name="commitMessage"/>
+
+        <engine:VisualElement class="row">
+            <engine:Button name="refreshBtn" text="Refresh"/>
+            <engine:Button name="commitBtn" text="Commit"/>
+            <engine:Button name="pushBtn" text="Push"/>
+        </engine:VisualElement>
+
+        <engine:Label text="Console" class="section"/>
+        <engine:TextField name="outputLog" multiline="true" class="changes-list"/>
+
+    </engine:VisualElement>
+
+</engine:UXML>
