@@ -1,5 +1,7 @@
 using UnityEditor;
 using UnityEngine;
+using System.IO;
+using System.Collections.Generic;
 
 public class KnowledgeAssistantWindow : EditorWindow
 {
@@ -8,25 +10,23 @@ public class KnowledgeAssistantWindow : EditorWindow
     private string tags = "";
     private string problem = "";
     private string solution = "";
-    private string codeSnippet = "";
 
-    private Vector2 scrollPos;
+    private string filePath;
 
     [MenuItem("Tools/Knowledge Assistant")]
     public static void ShowWindow()
     {
         GetWindow<KnowledgeAssistantWindow>("Knowledge Assistant");
     }
-    //test
+
+    private void OnEnable()
+    {
+        filePath = Path.Combine(Application.dataPath, "knowledge.json");
+    }
+
     private void OnGUI()
     {
-        scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-
-        GUILayout.Space(10);
-
         GUILayout.Label("Knowledge Entry Form", EditorStyles.boldLabel);
-
-        GUILayout.Space(5);
 
         entryTitle = EditorGUILayout.TextField("Title", entryTitle);
 
@@ -34,35 +34,83 @@ public class KnowledgeAssistantWindow : EditorWindow
 
         tags = EditorGUILayout.TextField("Tags", tags);
 
-        GUILayout.Space(10);
-
         GUILayout.Label("Problem");
-        problem = EditorGUILayout.TextArea(problem, GUILayout.Height(100));
-
-        GUILayout.Space(10);
+        problem = EditorGUILayout.TextArea(problem, GUILayout.Height(80));
 
         GUILayout.Label("Solution");
-        solution = EditorGUILayout.TextArea(solution, GUILayout.Height(100));
+        solution = EditorGUILayout.TextArea(solution, GUILayout.Height(80));
 
         GUILayout.Space(10);
 
-        GUILayout.Label("Code Snippet");
-        codeSnippet = EditorGUILayout.TextArea(codeSnippet, GUILayout.Height(120));
-
-        GUILayout.Space(15);
-
-        if (GUILayout.Button("Save Entry", GUILayout.Height(35)))
+        if (GUILayout.Button("Save Entry"))
         {
-            Debug.Log("=== Entry Saved ===");
+            SaveEntry();
+        }
+    }
 
-            Debug.Log($"Title: {entryTitle}");
-            Debug.Log($"Category: {category}");
-            Debug.Log($"Tags: {tags}");
-            Debug.Log($"Problem: {problem}");
-            Debug.Log($"Solution: {solution}");
-            Debug.Log($"Code Snippet: {codeSnippet}");
+    void SaveEntry()
+    {
+        Entry newEntry = new Entry()
+        {
+            title = entryTitle,
+            category = category,
+            tags = tags,
+            problem = problem,
+            solution = solution
+        };
+
+        List<Entry> entries = new List<Entry>();
+
+        // LOAD EXISTING JSON
+        if (File.Exists(filePath))
+        {
+            string json = File.ReadAllText(filePath);
+
+            Wrapper existingData = JsonUtility.FromJson<Wrapper>(json);
+
+            if (existingData != null && existingData.entries != null)
+            {
+                entries = existingData.entries;
+            }
         }
 
-        EditorGUILayout.EndScrollView();
+        // ADD NEW ENTRY
+        entries.Add(newEntry);
+
+        // CREATE WRAPPER
+        Wrapper wrapper = new Wrapper();
+        wrapper.entries = entries;
+
+        // SAVE JSON
+        string newJson = JsonUtility.ToJson(wrapper, true);
+
+        File.WriteAllText(filePath, newJson);
+
+        AssetDatabase.Refresh();
+
+        Debug.Log("Knowledge Entry Saved");
+
+        // CLEAR FIELDS
+        entryTitle = "";
+        category = "";
+        tags = "";
+        problem = "";
+        solution = "";
+    }
+
+    [System.Serializable]
+    public class Entry
+    {
+        public string title;
+        public string category;
+        public string tags;
+        public string problem;
+        public string solution;
+    }
+
+    [System.Serializable]
+    public class Wrapper
+    {
+        public List<Entry> entries;
     }
 }

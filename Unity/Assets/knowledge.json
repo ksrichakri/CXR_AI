@@ -1,0 +1,18 @@
+{
+    "entries": [
+        {
+            "title": "XR Controller Lag",
+            "category": "Peformance",
+            "tags": "XR, Optimization",
+            "problem": "Controller tracking jitter\t",
+            "solution": "Reduced update polling"
+        },
+        {
+            "title": "XR UI Flickering",
+            "category": "UI",
+            "tags": "XR, UI",
+            "problem": "Canvas flickering in VR\t",
+            "solution": "Changed render mode"
+        }
+    ]
+}
