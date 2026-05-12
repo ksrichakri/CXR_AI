@@ -10,7 +10,7 @@ public static class GitExecutor
             Process p = new Process();
             p.StartInfo.FileName = "git";
             p.StartInfo.Arguments = args;
-            p.StartInfo.WorkingDirectory = Application.dataPath + "/..";
+            p.StartInfo.WorkingDirectory = Application.dataPath + "/../..";
             p.StartInfo.RedirectStandardOutput = true;
             p.StartInfo.RedirectStandardError = true;
             p.StartInfo.UseShellExecute = false;

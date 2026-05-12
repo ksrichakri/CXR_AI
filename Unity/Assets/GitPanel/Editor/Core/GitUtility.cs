@@ -12,7 +12,7 @@ public static class GitUtility
             throw new System.Exception("Git missing");
         }
 
-        if (!Directory.Exists(Application.dataPath + "/../.git"))
+        if (!Directory.Exists(Application.dataPath + "/../../.git"))
         {
             EditorUtility.DisplayDialog("Error", "Not a Git repository", "OK");
             throw new System.Exception("Not repo");
