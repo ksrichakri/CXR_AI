@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
+using System;
 
 public class KnowledgeAssistantWindow : EditorWindow
 {
@@ -28,37 +29,37 @@ public class KnowledgeAssistantWindow : EditorWindow
     {
         GUILayout.Label("Knowledge Entry Form", EditorStyles.boldLabel);
 
+        GUILayout.Space(5);
+
         entryTitle = EditorGUILayout.TextField("Title", entryTitle);
 
         category = EditorGUILayout.TextField("Category", category);
 
         tags = EditorGUILayout.TextField("Tags", tags);
 
+        GUILayout.Space(5);
+
         GUILayout.Label("Problem");
         problem = EditorGUILayout.TextArea(problem, GUILayout.Height(80));
+
+        GUILayout.Space(5);
 
         GUILayout.Label("Solution");
         solution = EditorGUILayout.TextArea(solution, GUILayout.Height(80));
 
         GUILayout.Space(10);
 
-        if (GUILayout.Button("Save Entry"))
+        if (GUILayout.Button("Save Entry", GUILayout.Height(30)))
         {
             SaveEntry();
         }
     }
 
+    // =========================================
+    // SAVE ENTRY
+    // =========================================
     void SaveEntry()
     {
-        Entry newEntry = new Entry()
-        {
-            title = entryTitle,
-            category = category,
-            tags = tags,
-            problem = problem,
-            solution = solution
-        };
-
         List<Entry> entries = new List<Entry>();
 
         // LOAD EXISTING JSON
@@ -74,23 +75,40 @@ public class KnowledgeAssistantWindow : EditorWindow
             }
         }
 
-        // ADD NEW ENTRY
+        // GENERATE UNIQUE ID
+        string generatedID = GenerateID(entries.Count);
+
+        // CREATE NEW ENTRY
+        Entry newEntry = new Entry()
+        {
+            id = generatedID,
+            title = entryTitle,
+            category = category,
+            tags = tags,
+            problem = problem,
+            solution = solution,
+            createdAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+        };
+
+        // ADD ENTRY
         entries.Add(newEntry);
 
         // CREATE WRAPPER
         Wrapper wrapper = new Wrapper();
         wrapper.entries = entries;
 
-        // SAVE JSON
+        // CONVERT TO JSON
         string newJson = JsonUtility.ToJson(wrapper, true);
 
+        // SAVE FILE
         File.WriteAllText(filePath, newJson);
 
+        // REFRESH UNITY
         AssetDatabase.Refresh();
 
-        Debug.Log("Knowledge Entry Saved");
+        Debug.Log($"Knowledge Entry Saved: {generatedID}");
 
-        // CLEAR FIELDS
+        // CLEAR FORM
         entryTitle = "";
         category = "";
         tags = "";
@@ -98,16 +116,38 @@ public class KnowledgeAssistantWindow : EditorWindow
         solution = "";
     }
 
+    // =========================================
+    // GENERATE UNIQUE ID
+    // =========================================
+    string GenerateID(int count)
+    {
+        return $"KB-{(count + 1).ToString("D4")}";
+    }
+
+    // =========================================
+    // ENTRY MODEL
+    // =========================================
     [System.Serializable]
     public class Entry
     {
+        public string id;
+
         public string title;
+
         public string category;
+
         public string tags;
+
         public string problem;
+
         public string solution;
+
+        public string createdAt;
     }
 
+    // =========================================
+    // JSON WRAPPER
+    // =========================================
     [System.Serializable]
     public class Wrapper
     {
