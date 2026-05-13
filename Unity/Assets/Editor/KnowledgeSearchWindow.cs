@@ -8,7 +8,22 @@ public class KnowledgeSearchWindow : EditorWindow
     private string searchQuery = "";
 
     private List<Entry> searchResults = new List<Entry>();
+
     private Vector2 scrollPosition;
+
+    // FILTER SYSTEM
+    private int filterIndex = 0;
+
+    private string[] filters =
+    {
+        "All",
+        "ID",
+        "Title",
+        "Category",
+        "Tags",
+        "Problem",
+        "Solution"
+    };
 
     private string filePath;
 
@@ -29,22 +44,50 @@ public class KnowledgeSearchWindow : EditorWindow
 
         GUILayout.Space(10);
 
-        searchQuery = EditorGUILayout.TextField("Search", searchQuery);
+        // SEARCH FIELD
+        searchQuery = EditorGUILayout.TextField(
+            "Search",
+            searchQuery
+        );
 
         GUILayout.Space(10);
+
+        // FILTER DROPDOWN
+        filterIndex = EditorGUILayout.Popup(
+            "Filter By",
+            filterIndex,
+            filters
+        );
+
+        GUILayout.Space(10);
+
+        // BUTTONS
+        GUILayout.BeginHorizontal();
 
         if (GUILayout.Button("Search"))
         {
             SearchKnowledge();
         }
 
+        if (GUILayout.Button("Clear"))
+        {
+            searchQuery = "";
+            searchResults.Clear();
+        }
+
+        GUILayout.EndHorizontal();
+
         GUILayout.Space(15);
 
-        GUILayout.Label("Results", EditorStyles.boldLabel);
+        // RESULT COUNT
+        GUILayout.Label(
+            $"Results ({searchResults.Count})",
+            EditorStyles.boldLabel
+        );
 
         GUILayout.Space(5);
 
-        // SCROLL VIEW START
+        // SCROLL VIEW
         scrollPosition = GUILayout.BeginScrollView(
             scrollPosition,
             GUILayout.Height(400)
@@ -55,7 +98,6 @@ public class KnowledgeSearchWindow : EditorWindow
             DrawEntry(entry);
         }
 
-        // SCROLL VIEW END
         GUILayout.EndScrollView();
     }
 
@@ -84,14 +126,48 @@ public class KnowledgeSearchWindow : EditorWindow
 
         foreach (var entry in data.entries)
         {
-            if (
-                entry.id.ToLower().Contains(searchQuery.ToLower()) ||
-                entry.title.ToLower().Contains(searchQuery.ToLower()) ||
-                entry.category.ToLower().Contains(searchQuery.ToLower()) ||
-                entry.tags.ToLower().Contains(searchQuery.ToLower()) ||
-                entry.problem.ToLower().Contains(searchQuery.ToLower()) ||
-                entry.solution.ToLower().Contains(searchQuery.ToLower())
-            )
+            string query = searchQuery.ToLower();
+
+            bool match = false;
+
+            switch (filters[filterIndex])
+            {
+                case "All":
+                    match =
+                        entry.id.ToLower().Contains(query) ||
+                        entry.title.ToLower().Contains(query) ||
+                        entry.category.ToLower().Contains(query) ||
+                        entry.tags.ToLower().Contains(query) ||
+                        entry.problem.ToLower().Contains(query) ||
+                        entry.solution.ToLower().Contains(query);
+                    break;
+
+                case "ID":
+                    match = entry.id.ToLower().Contains(query);
+                    break;
+
+                case "Title":
+                    match = entry.title.ToLower().Contains(query);
+                    break;
+
+                case "Category":
+                    match = entry.category.ToLower().Contains(query);
+                    break;
+
+                case "Tags":
+                    match = entry.tags.ToLower().Contains(query);
+                    break;
+
+                case "Problem":
+                    match = entry.problem.ToLower().Contains(query);
+                    break;
+
+                case "Solution":
+                    match = entry.solution.ToLower().Contains(query);
+                    break;
+            }
+
+            if (match)
             {
                 searchResults.Add(entry);
             }
@@ -107,7 +183,10 @@ public class KnowledgeSearchWindow : EditorWindow
     {
         GUILayout.BeginVertical("box");
 
-        GUILayout.Label($"ID: {entry.id}", EditorStyles.boldLabel);
+        GUILayout.Label(
+            $"ID: {entry.id}",
+            EditorStyles.boldLabel
+        );
 
         GUILayout.Label($"Title: {entry.title}");
 
