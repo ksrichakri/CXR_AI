@@ -1,94 +1,94 @@
 {
-  "entries": [
-    {
-      "id": "KB-0001",
-      "title": "XR UI Flickering",
-      "category": "UI",
-      "tags": "XR,UI",
-      "problem": "Canvas flickering in VR UI",
-      "solution": "Changed render mode to World Space",
-      "createdAt": "2026-05-12 10:15:56"
-    },
-    {
-      "id": "KB-0002",
-      "title": "XR Controller Lag",
-      "category": "Performance",
-      "tags": "XR,Optimization",
-      "problem": "Controller tracking jitter",
-      "solution": "Reduced update polling frequency",
-      "createdAt": "2026-05-13 09:29:40"
-    },
-    {
-      "id": "KB-0003",
-      "title": "Hand Tracking Delay",
-      "category": "Tracking",
-      "tags": "XR,HandTracking",
-      "problem": "Delayed hand response during movement",
-      "solution": "Optimized hand tracking update loop",
-      "createdAt": "2026-05-13 10:05:12"
-    },
-    {
-      "id": "KB-0004",
-      "title": "VR Audio Distortion",
-      "category": "Audio",
-      "tags": "XR,Audio",
-      "problem": "Spatial audio distortion in headset",
-      "solution": "Adjusted audio spatial blend settings",
-      "createdAt": "2026-05-13 10:22:34"
-    },
-    {
-      "id": "KB-0005",
-      "title": "Low FPS in XR Scene",
-      "category": "Performance",
-      "tags": "XR,FPS,Optimization",
-      "problem": "Frame drops in dense environments",
-      "solution": "Reduced real-time lighting and shadows",
-      "createdAt": "2026-05-13 10:45:08"
-    },
-    {
-      "id": "KB-0006",
-      "title": "Teleportation Not Working",
-      "category": "Gameplay",
-      "tags": "XR,Locomotion",
-      "problem": "Teleport ray not detecting surfaces",
-      "solution": "Updated interaction layer masks",
-      "createdAt": "2026-05-13 11:02:17"
-    },
-    {
-      "id": "KB-0007",
-      "title": "UI Button Not Clickable",
-      "category": "UI",
-      "tags": "XR,UI,Input",
-      "problem": "XR ray interactor not triggering button",
-      "solution": "Enabled graphic raycaster component",
-      "createdAt": "2026-05-13 11:18:55"
-    },
-    {
-      "id": "KB-0008",
-      "title": "Headset Rotation Drift",
-      "category": "Tracking",
-      "tags": "XR,Tracking",
-      "problem": "Camera slowly drifting during runtime",
-      "solution": "Recalibrated tracking origin mode",
-      "createdAt": "2026-05-13 11:37:41"
-    },
-    {
-      "id": "KB-0009",
-      "title": "Scene Loading Freeze",
-      "category": "Performance",
-      "tags": "XR,Loading",
-      "problem": "Application freezing during scene transition",
-      "solution": "Implemented async scene loading",
-      "createdAt": "2026-05-13 11:58:09"
-    },
-    {
-      "id": "KB-0010",
-      "title": "Controller Vibration Missing",
-      "category": "Input",
-      "tags": "XR,Haptics",
-      "problem": "Haptic feedback not triggering",
-      "solution": "Updated XR input action bindings",
-      "createdAt": "2026-05-13 12:16:44"
-    }
-  ]
+    "entries": [
+        {
+            "id": "KB-0001",
+            "title": "XR UI Flickering",
+            "category": "UI",
+            "tags": "XR,UI",
+            "problem": "Canvas flickering in VR UI",
+            "solution": "Changed render mode to World Space and also adjusted canvas position",
+            "createdAt": "2026-05-12 10:15:56"
+        },
+        {
+            "id": "KB-0002",
+            "title": "XR Controller Lag",
+            "category": "Performance",
+            "tags": "XR,Optimization",
+            "problem": "Controller tracking jitter",
+            "solution": "Reduced update polling frequency",
+            "createdAt": "2026-05-13 09:29:40"
+        },
+        {
+            "id": "KB-0003",
+            "title": "Hand Tracking Delay",
+            "category": "Tracking",
+            "tags": "XR,HandTracking",
+            "problem": "Delayed hand response during movement",
+            "solution": "Optimized hand tracking update loop",
+            "createdAt": "2026-05-13 10:05:12"
+        },
+        {
+            "id": "KB-0004",
+            "title": "VR Audio Distortion",
+            "category": "Audio",
+            "tags": "XR,Audio",
+            "problem": "Spatial audio distortion in headset",
+            "solution": "Adjusted audio spatial blend settings",
+            "createdAt": "2026-05-13 10:22:34"
+        },
+        {
+            "id": "KB-0005",
+            "title": "Low FPS in XR Scene",
+            "category": "Performance",
+            "tags": "XR,FPS,Optimization",
+            "problem": "Frame drops in dense environments",
+            "solution": "Reduced real-time lighting and shadows",
+            "createdAt": "2026-05-13 10:45:08"
+        },
+        {
+            "id": "KB-0006",
+            "title": "Teleportation Not Working",
+            "category": "Gameplay",
+            "tags": "XR,Locomotion",
+            "problem": "Teleport ray not detecting surfaces",
+            "solution": "Updated interaction layer masks",
+            "createdAt": "2026-05-13 11:02:17"
+        },
+        {
+            "id": "KB-0007",
+            "title": "UI Button Not Clickable",
+            "category": "UI",
+            "tags": "XR,UI,Input",
+            "problem": "XR ray interactor not triggering button",
+            "solution": "Enabled graphic raycaster component",
+            "createdAt": "2026-05-13 11:18:55"
+        },
+        {
+            "id": "KB-0008",
+            "title": "Headset Rotation Drift",
+            "category": "Tracking",
+            "tags": "XR,Tracking",
+            "problem": "Camera slowly drifting during runtime",
+            "solution": "Recalibrated tracking origin mode",
+            "createdAt": "2026-05-13 11:37:41"
+        },
+        {
+            "id": "KB-0009",
+            "title": "Scene Loading Freeze",
+            "category": "Performance",
+            "tags": "XR,Loading",
+            "problem": "Application freezing during scene transition",
+            "solution": "Implemented async scene loading",
+            "createdAt": "2026-05-13 11:58:09"
+        },
+        {
+            "id": "KB-0010",
+            "title": "Controller Vibration Missing",
+            "category": "Input",
+            "tags": "XR,Haptics",
+            "problem": "Haptic feedback not triggering",
+            "solution": "Updated XR input action bindings",
+            "createdAt": "2026-05-13 12:16:44"
+        }
+    ]
 }

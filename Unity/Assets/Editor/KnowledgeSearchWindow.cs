@@ -1,4 +1,4 @@
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
@@ -10,6 +10,11 @@ public class KnowledgeSearchWindow : EditorWindow
     private List<Entry> searchResults = new List<Entry>();
 
     private Vector2 scrollPosition;
+
+    // COLLAPSIBLE STATE
+    private Dictionary<string, bool> expandedEntries =
+        new Dictionary<string, bool>();
+    private string currentlyEditingID = "";
 
     // FILTER SYSTEM
     private int filterIndex = 0;
@@ -24,23 +29,49 @@ public class KnowledgeSearchWindow : EditorWindow
         "Problem",
         "Solution"
     };
+    private int sortIndex = 0;
 
+    private string[] sortOptions =
+    {
+    "Newest",
+    "Oldest",
+    "ID",
+    "Title"
+    };
     private string filePath;
+
+    private GUIStyle richLabelStyle;
 
     [MenuItem("Tools/Knowledge Search")]
     public static void ShowWindow()
     {
-        GetWindow<KnowledgeSearchWindow>("Knowledge Search");
+        GetWindow<KnowledgeSearchWindow>(
+            "Knowledge Search"
+        );
     }
 
     private void OnEnable()
     {
-        filePath = Path.Combine(Application.dataPath, "knowledge.json");
+        filePath = Path.Combine(
+            Application.dataPath,
+            "knowledge.json"
+        );
+
+        // RICH TEXT STYLE
+        richLabelStyle =
+            new GUIStyle(EditorStyles.label);
+
+        richLabelStyle.richText = true;
+
+        richLabelStyle.wordWrap = true;
     }
 
     private void OnGUI()
     {
-        GUILayout.Label("Knowledge Search", EditorStyles.boldLabel);
+        GUILayout.Label(
+            "Knowledge Search",
+            EditorStyles.boldLabel
+        );
 
         GUILayout.Space(10);
 
@@ -57,6 +88,15 @@ public class KnowledgeSearchWindow : EditorWindow
             "Filter By",
             filterIndex,
             filters
+        );
+
+        GUILayout.Space(10);
+
+        // SORT DROPDOWN
+        sortIndex = EditorGUILayout.Popup(
+            "Sort By",
+            sortIndex,
+            sortOptions
         );
 
         GUILayout.Space(10);
@@ -90,7 +130,7 @@ public class KnowledgeSearchWindow : EditorWindow
         // SCROLL VIEW
         scrollPosition = GUILayout.BeginScrollView(
             scrollPosition,
-            GUILayout.Height(400)
+            GUILayout.ExpandHeight(true)
         );
 
         foreach (var entry in searchResults)
@@ -110,23 +150,31 @@ public class KnowledgeSearchWindow : EditorWindow
 
         if (!File.Exists(filePath))
         {
-            Debug.LogError("knowledge.json not found");
+            Debug.LogError(
+                "knowledge.json not found"
+            );
             return;
         }
 
-        string json = File.ReadAllText(filePath);
+        string json =
+            File.ReadAllText(filePath);
 
-        Wrapper data = JsonUtility.FromJson<Wrapper>(json);
+        Wrapper data =
+            JsonUtility.FromJson<Wrapper>(json);
 
-        if (data == null || data.entries == null)
+        if (data == null ||
+            data.entries == null)
         {
-            Debug.LogError("No entries found");
+            Debug.LogError(
+                "No entries found"
+            );
             return;
         }
 
         foreach (var entry in data.entries)
         {
-            string query = searchQuery.ToLower();
+            string query =
+                searchQuery.ToLower();
 
             bool match = false;
 
@@ -143,27 +191,33 @@ public class KnowledgeSearchWindow : EditorWindow
                     break;
 
                 case "ID":
-                    match = entry.id.ToLower().Contains(query);
+                    match =
+                        entry.id.ToLower().Contains(query);
                     break;
 
                 case "Title":
-                    match = entry.title.ToLower().Contains(query);
+                    match =
+                        entry.title.ToLower().Contains(query);
                     break;
 
                 case "Category":
-                    match = entry.category.ToLower().Contains(query);
+                    match =
+                        entry.category.ToLower().Contains(query);
                     break;
 
                 case "Tags":
-                    match = entry.tags.ToLower().Contains(query);
+                    match =
+                        entry.tags.ToLower().Contains(query);
                     break;
 
                 case "Problem":
-                    match = entry.problem.ToLower().Contains(query);
+                    match =
+                        entry.problem.ToLower().Contains(query);
                     break;
 
                 case "Solution":
-                    match = entry.solution.ToLower().Contains(query);
+                    match =
+                        entry.solution.ToLower().Contains(query);
                     break;
             }
 
@@ -172,39 +226,342 @@ public class KnowledgeSearchWindow : EditorWindow
                 searchResults.Add(entry);
             }
         }
+        // SORT RESULTS
+        switch (sortOptions[sortIndex])
+        {
+            case "Newest":
+                searchResults.Sort((a, b) =>
+                    b.createdAt.CompareTo(a.createdAt));
+                break;
 
-        Debug.Log($"Found {searchResults.Count} result(s)");
+            case "Oldest":
+                searchResults.Sort((a, b) =>
+                    a.createdAt.CompareTo(b.createdAt));
+                break;
+
+            case "ID":
+                searchResults.Sort((a, b) =>
+                    a.id.CompareTo(b.id));
+                break;
+
+            case "Title":
+                searchResults.Sort((a, b) =>
+                    a.title.CompareTo(b.title));
+                break;
+        }
+        Debug.Log(
+            $"Found {searchResults.Count} result(s)"
+        );
     }
 
     // =========================================
-    // DRAW RESULT ENTRY
+    // DRAW ENTRY
     // =========================================
     void DrawEntry(Entry entry)
     {
         GUILayout.BeginVertical("box");
 
-        GUILayout.Label(
-            $"ID: {entry.id}",
-            EditorStyles.boldLabel
-        );
+        // INITIALIZE STATE
+        if (!expandedEntries.ContainsKey(entry.id))
+        {
+            expandedEntries[entry.id] = false;
+        }
 
-        GUILayout.Label($"Title: {entry.title}");
+        bool expanded =
+            expandedEntries[entry.id];
 
-        GUILayout.Label($"Category: {entry.category}");
+        // HEADER
+        string arrow =
+            expanded ? "▼" : "▶";
 
-        GUILayout.Label($"Tags: {entry.tags}");
+        GUIStyle headerStyle =
+            new GUIStyle(EditorStyles.boldLabel);
 
-        GUILayout.Label($"Problem: {entry.problem}");
+        headerStyle.richText = true;
 
-        GUILayout.Label($"Solution: {entry.solution}");
+        if (GUILayout.Button(
+            $"{arrow} {entry.id} - {HighlightMatch(entry.title)}",
+            headerStyle
+        ))
+        {
+            expandedEntries[entry.id] =
+                !expanded;
+        }
 
-        GUILayout.Label($"Created: {entry.createdAt}");
+        // EXPANDED CONTENT
+        // EXPANDED CONTENT
+        if (expandedEntries[entry.id])
+        {
+            bool isEditing =
+                currentlyEditingID == entry.id;
+
+            GUILayout.Space(5);
+
+            // =====================================
+            // EDIT MODE
+            // =====================================
+            if (isEditing)
+            {
+                GUILayout.Label("Title");
+                entry.title = EditorGUILayout.TextField(
+                    entry.title
+                );
+
+                GUILayout.Label("Category");
+                entry.category = EditorGUILayout.TextField(
+                    entry.category
+                );
+
+                GUILayout.Label("Tags");
+                entry.tags = EditorGUILayout.TextField(
+                    entry.tags
+                );
+
+                // DYNAMIC HEIGHTS
+                float problemHeight =
+                    Mathf.Max(
+                        60,
+                        EditorStyles.textArea.CalcHeight(
+                            new GUIContent(entry.problem),
+                            position.width - 40
+                        )
+                    );
+
+                float solutionHeight =
+                    Mathf.Max(
+                        60,
+                        EditorStyles.textArea.CalcHeight(
+                            new GUIContent(entry.solution),
+                            position.width - 40
+                        )
+                    );
+
+                // PROBLEM FIELD
+                GUILayout.Label("Problem");
+
+                entry.problem =
+                    EditorGUILayout.TextArea(
+                        entry.problem,
+                        GUILayout.Height(problemHeight)
+                    );
+
+                // SOLUTION FIELD
+                GUILayout.Label("Solution");
+
+                entry.solution =
+                    EditorGUILayout.TextArea(
+                        entry.solution,
+                        GUILayout.Height(solutionHeight)
+                    );  
+            }
+
+            // =====================================
+            // NORMAL VIEW MODE
+            // =====================================
+            else
+            {
+                GUILayout.Label(
+                    $"Category: {HighlightMatch(entry.category)}",
+                    richLabelStyle
+                );
+
+                GUILayout.Label(
+                    $"Tags: {HighlightMatch(entry.tags)}",
+                    richLabelStyle
+                );
+
+                GUILayout.Label(
+                    $"Problem: {HighlightMatch(entry.problem)}",
+                    richLabelStyle
+                );
+
+                GUILayout.Label(
+                    $"Solution: {HighlightMatch(entry.solution)}",
+                    richLabelStyle
+                );
+            }
+
+            GUILayout.Label(
+                $"Created: {entry.createdAt}"
+            );
+
+            GUILayout.Space(10);
+
+            // =====================================
+            // ACTION BUTTONS
+            // =====================================
+            GUILayout.BeginHorizontal();
+
+            // =========================
+            // EDIT BUTTON
+            // =========================
+            if (!isEditing)
+            {
+                if (GUILayout.Button("Edit"))
+                {
+                    currentlyEditingID = entry.id;
+
+                    Debug.Log(
+                        $"Editing Mode Enabled: {entry.id}"
+                    );
+                }
+            }
+
+            // =========================
+            // SAVE BUTTON
+            // =========================
+            if (isEditing)
+            {
+                if (GUILayout.Button("Save Changes"))
+                {
+                    SaveEditedEntry(entry);
+
+                    currentlyEditingID = "";
+
+                    Debug.Log(
+                        $"Saved Changes: {entry.id}"
+                    );
+                }
+            }
+
+            // =========================
+            // DELETE BUTTON
+            // =========================
+            if (GUILayout.Button("Delete"))
+            {
+                DeleteEntry(entry.id);
+            }
+
+            GUILayout.EndHorizontal();
+        }
 
         GUILayout.EndVertical();
 
         GUILayout.Space(5);
     }
 
+    void DeleteEntry(string entryID)
+    {
+
+        if (!File.Exists(filePath))
+        {
+            Debug.LogError("knowledge.json not found");
+            return;
+        }
+
+        string json = File.ReadAllText(filePath);
+
+        Wrapper data =
+            JsonUtility.FromJson<Wrapper>(json);
+
+        if (data == null || data.entries == null)
+        {
+            Debug.LogError("No entries found");
+            return;
+        }
+
+        // REMOVE ENTRY
+        data.entries.RemoveAll(
+            entry => entry.id == entryID
+        );
+
+        // SAVE UPDATED JSON
+        string updatedJson =
+            JsonUtility.ToJson(data, true);
+
+        File.WriteAllText(filePath, updatedJson);
+
+        AssetDatabase.Refresh();
+
+        // REMOVE FROM SEARCH RESULTS
+        searchResults.RemoveAll(
+            entry => entry.id == entryID
+        );
+
+        Debug.Log($"Deleted Entry: {entryID}");
+    }
+    void SaveEditedEntry(Entry updatedEntry)
+    {
+        if (!File.Exists(filePath))
+        {
+            Debug.LogError(
+                "knowledge.json not found"
+            );
+            return;
+        }
+
+        string json =
+            File.ReadAllText(filePath);
+
+        Wrapper data =
+            JsonUtility.FromJson<Wrapper>(json);
+
+        if (data == null ||
+            data.entries == null)
+        {
+            Debug.LogError(
+                "No entries found"
+            );
+            return;
+        }
+
+        // FIND ENTRY
+        for (int i = 0; i < data.entries.Count; i++)
+        {
+            if (data.entries[i].id ==
+                updatedEntry.id)
+            {
+                data.entries[i] = updatedEntry;
+                break;
+            }
+        }
+
+        // SAVE UPDATED JSON
+        string updatedJson =
+            JsonUtility.ToJson(data, true);
+
+        File.WriteAllText(
+            filePath,
+            updatedJson
+        );
+
+        AssetDatabase.Refresh();
+    }
+    string HighlightMatch(string text)
+    {
+        if (string.IsNullOrEmpty(searchQuery))
+        {
+            return text;
+        }
+
+        string lowerText =
+            text.ToLower();
+
+        string lowerQuery =
+            searchQuery.ToLower();
+
+        int index =
+            lowerText.IndexOf(lowerQuery);
+
+        if (index < 0)
+        {
+            return text;
+        }
+
+        string matchedPart =
+            text.Substring(
+                index,
+                searchQuery.Length
+            );
+
+        string highlighted =
+            text.Replace(
+                matchedPart,
+                $"<color=yellow><b>{matchedPart}</b></color>"
+            );
+
+        return highlighted;
+    }
     // =========================================
     // DATA MODEL
     // =========================================
