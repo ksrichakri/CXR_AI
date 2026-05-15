@@ -365,10 +365,40 @@ public class KnowledgeSearchWindow : EditorWindow
                     richLabelStyle
                 );
 
-                GUILayout.Label(
-                    $"Tags: {HighlightMatch(entry.tags)}",
-                    richLabelStyle
-                );
+                // TAGS LABEL
+                GUILayout.Label("Tags");
+
+                // SPLIT TAGS
+                string[] splitTags =
+                    entry.tags.Split(',');
+
+                // TAG BUTTON ROW
+                GUILayout.BeginHorizontal();
+
+                foreach (string rawTag in splitTags)
+                {
+                    string tag = rawTag.Trim();
+
+                    if (GUILayout.Button(
+                        HighlightMatch(tag),
+                        richLabelStyle,
+                        GUILayout.Height(25)
+                    ))
+                    {
+                        searchQuery = tag;
+
+                        // TAG FILTER INDEX
+                        filterIndex = 4;
+
+                        SearchKnowledge();
+
+                        Debug.Log(
+                            $"Quick Filter Tag: {tag}"
+                        );
+                    }
+                }
+
+                GUILayout.EndHorizontal();
 
                 GUILayout.Label(
                     $"Problem: {HighlightMatch(entry.problem)}",
