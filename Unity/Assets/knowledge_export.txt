@@ -32,6 +32,17 @@ Matched Fields: Title, Tags
 Created: 2026-05-13 10:45:08
 
 ==================================
+ID: KB-0011
+Title: UI Button not visible and working properly
+Category: XR, Interaction Toolkit
+Tags: XR, VR UI
+Problem: Unity VR UI Buttons not working
+Solution: Set Canvas to World Space, add Tracked device Graphic Raycaster and use XR UI Input Module.
+Relevance Score: 8
+Matched Fields: Tags, Category, Solution
+Created: 2026-05-18 10:21:14
+
+==================================
 ID: KB-0007
 Title: UI Button Not Clickable
 Category: UI
