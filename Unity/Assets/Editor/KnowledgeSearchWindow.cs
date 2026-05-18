@@ -33,6 +33,7 @@ public class KnowledgeSearchWindow : EditorWindow
 
     private string[] sortOptions =
     {
+    "Relevance",
     "Newest",
     "Oldest",
     "ID",
@@ -170,26 +171,86 @@ public class KnowledgeSearchWindow : EditorWindow
             );
             return;
         }
+        string query = searchQuery.ToLower();
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            Debug.Log("Empty search query");
+            return;
+        }
 
         foreach (var entry in data.entries)
         {
-            string query =
-                searchQuery.ToLower();
 
             bool match = false;
 
+            int score = 0;
+            entry.matchedFields.Clear();
+
+            // =========================
+            // TITLE
+            // =========================
+            if (entry.title.ToLower().Contains(query))
+            {
+                match = true;
+
+                score += 5;
+
+                entry.matchedFields.Add("Title");
+            }
+
+            // =========================
+            // TAGS
+            // =========================
+            if (entry.tags.ToLower().Contains(query))
+            {
+                match = true;
+
+                score += 4;
+
+                entry.matchedFields.Add("Tags");
+            }
+
+            // =========================
+            // CATEGORY
+            // =========================
+            if (entry.category.ToLower().Contains(query))
+            {
+                match = true;
+
+                score += 3;
+
+                entry.matchedFields.Add("Category");
+            }
+
+            // =========================
+            // PROBLEM
+            // =========================
+            if (entry.problem.ToLower().Contains(query))
+            {
+                match = true;
+
+                score += 2;
+
+                entry.matchedFields.Add("Problem");
+            }
+
+            // =========================
+            // SOLUTION
+            // =========================
+            if (entry.solution.ToLower().Contains(query))
+            {
+                match = true;
+
+                score += 1;
+
+                entry.matchedFields.Add("Solution");
+            }
+
+            // =========================
+            // FILTER OVERRIDES
+            // =========================
             switch (filters[filterIndex])
             {
-                case "All":
-                    match =
-                        entry.id.ToLower().Contains(query) ||
-                        entry.title.ToLower().Contains(query) ||
-                        entry.category.ToLower().Contains(query) ||
-                        entry.tags.ToLower().Contains(query) ||
-                        entry.problem.ToLower().Contains(query) ||
-                        entry.solution.ToLower().Contains(query);
-                    break;
-
                 case "ID":
                     match =
                         entry.id.ToLower().Contains(query);
@@ -221,32 +282,54 @@ public class KnowledgeSearchWindow : EditorWindow
                     break;
             }
 
+            // STORE SCORE
+            entry.relevanceScore = score;
+
             if (match)
             {
                 searchResults.Add(entry);
             }
         }
+        // =========================
         // SORT RESULTS
         switch (sortOptions[sortIndex])
         {
+            case "Relevance":
+
+                searchResults.Sort((a, b) =>
+                    b.relevanceScore.CompareTo(
+                        a.relevanceScore
+                    )
+                );
+
+                break;
+
             case "Newest":
+
                 searchResults.Sort((a, b) =>
                     b.createdAt.CompareTo(a.createdAt));
+
                 break;
 
             case "Oldest":
+
                 searchResults.Sort((a, b) =>
                     a.createdAt.CompareTo(b.createdAt));
+
                 break;
 
             case "ID":
+
                 searchResults.Sort((a, b) =>
                     a.id.CompareTo(b.id));
+
                 break;
 
             case "Title":
+
                 searchResults.Sort((a, b) =>
                     a.title.CompareTo(b.title));
+
                 break;
         }
         Debug.Log(
@@ -288,7 +371,6 @@ public class KnowledgeSearchWindow : EditorWindow
                 !expanded;
         }
 
-        // EXPANDED CONTENT
         // EXPANDED CONTENT
         if (expandedEntries[entry.id])
         {
@@ -414,6 +496,20 @@ public class KnowledgeSearchWindow : EditorWindow
             GUILayout.Label(
                 $"Created: {entry.createdAt}"
             );
+            GUILayout.Label(
+                $"Relevance Score: {entry.relevanceScore}"
+            );
+            GUILayout.Space(5);
+
+            GUILayout.Label(
+                "Matched Fields:",
+                EditorStyles.boldLabel
+            );
+
+            foreach (string field in entry.matchedFields)
+            {
+                GUILayout.Label($"• {field}");
+            }
 
             GUILayout.Space(10);
 
@@ -564,33 +660,65 @@ public class KnowledgeSearchWindow : EditorWindow
             return text;
         }
 
+        if (string.IsNullOrEmpty(text))
+        {
+            return text;
+        }
+
+        string highlightedText = text;
+
         string lowerText =
             text.ToLower();
 
         string lowerQuery =
             searchQuery.ToLower();
 
-        int index =
-            lowerText.IndexOf(lowerQuery);
+        int startIndex = 0;
 
-        if (index < 0)
+        while (true)
         {
-            return text;
+            int matchIndex =
+                lowerText.IndexOf(
+                    lowerQuery,
+                    startIndex
+                );
+
+            if (matchIndex < 0)
+            {
+                break;
+            }
+
+            string originalMatch =
+                highlightedText.Substring(
+                    matchIndex,
+                    searchQuery.Length
+                );
+
+            string highlightedMatch =
+                $"<color=yellow><b>{originalMatch}</b></color>";
+
+            highlightedText =
+                highlightedText.Remove(
+                    matchIndex,
+                    searchQuery.Length
+                );
+
+            highlightedText =
+                highlightedText.Insert(
+                    matchIndex,
+                    highlightedMatch
+                );
+
+            // UPDATE LOWER TEXT
+            lowerText =
+                highlightedText.ToLower();
+
+            startIndex =
+                matchIndex +
+                highlightedMatch.Length;
         }
 
-        string matchedPart =
-            text.Substring(
-                index,
-                searchQuery.Length
-            );
-
-        string highlighted =
-            text.Replace(
-                matchedPart,
-                $"<color=yellow><b>{matchedPart}</b></color>"
-            );
-
-        return highlighted;
+        return highlightedText;
     }
     // =========================================
     // DATA MODEL
@@ -611,6 +739,11 @@ public class KnowledgeSearchWindow : EditorWindow
         public string solution;
 
         public string createdAt;
+        [System.NonSerialized]
+        public int relevanceScore;
+        [System.NonSerialized]
+        public List<string> matchedFields =
+        new List<string>();
     }
 
     [System.Serializable]
