@@ -10,7 +10,10 @@ public class KnowledgeSearchWindow : EditorWindow
     private List<Entry> searchResults = new List<Entry>();
 
     private Vector2 scrollPosition;
-
+    private List<string> searchHistory =
+        new List<string>();
+    private List<string> favoriteQueries =
+        new List<string>();
     // COLLAPSIBLE STATE
     private Dictionary<string, bool> expandedEntries =
         new Dictionary<string, bool>();
@@ -117,13 +120,94 @@ public class KnowledgeSearchWindow : EditorWindow
         }
 
         GUILayout.EndHorizontal();
+        GUILayout.Space(5);
+
+        if (GUILayout.Button("Save Current Search"))
+        {
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                if (!favoriteQueries.Contains(searchQuery))
+                {
+                    favoriteQueries.Add(searchQuery);
+
+                    Debug.Log(
+                        $"Saved Favorite Query: {searchQuery}"
+                    );
+                }
+            }
+        }
         GUILayout.Space(10);
 
         if (GUILayout.Button("Export Results"))
         {
             ExportResults();
         }
+        // =========================
+        // SEARCH HISTORY
+        // =========================
+        if (searchHistory.Count > 0)
+        {
+            GUILayout.Label(
+                "Recent Searches",
+                EditorStyles.boldLabel
+            );
 
+            GUILayout.BeginHorizontal();
+
+            foreach (string historyItem in searchHistory)
+            {
+                if (GUILayout.Button(
+                    historyItem,
+                    GUILayout.Height(25)
+                ))
+                {
+                    searchQuery = historyItem;
+
+                    SearchKnowledge();
+
+                    Debug.Log(
+                        $"History Search: {historyItem}"
+                    );
+                }
+            }
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+        }
+        // =========================
+        // FAVORITE QUERIES
+        // =========================
+        if (favoriteQueries.Count > 0)
+        {
+            GUILayout.Label(
+                "Favorite Queries",
+                EditorStyles.boldLabel
+            );
+
+            GUILayout.BeginHorizontal();
+
+            foreach (string favorite in favoriteQueries)
+            {
+                if (GUILayout.Button(
+                    $"★ {favorite}",
+                    GUILayout.Height(25)
+                ))
+                {
+                    searchQuery = favorite;
+
+                    SearchKnowledge();
+
+                    Debug.Log(
+                        $"Favorite Query Loaded: {favorite}"
+                    );
+                }
+            }
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+        }
         GUILayout.Space(15);
 
         // RESULT COUNT
@@ -189,7 +273,17 @@ public class KnowledgeSearchWindow : EditorWindow
             Debug.Log("Empty search query");
             return;
         }
+        // ADD TO SEARCH HISTORY
+        if (!searchHistory.Contains(searchQuery))
+        {
+            searchHistory.Insert(0, searchQuery);
 
+            // LIMIT HISTORY SIZE
+            if (searchHistory.Count > 10)
+            {
+                searchHistory.RemoveAt(10);
+            }
+        }
         foreach (var entry in data.entries)
         {
 

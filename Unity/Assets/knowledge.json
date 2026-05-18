@@ -89,6 +89,15 @@
             "problem": "Haptic feedback not triggering",
             "solution": "Updated XR input action bindings",
             "createdAt": "2026-05-13 12:16:44"
+        },
+        {
+            "id": "KB-0011",
+            "title": "UI Button not visible and working properly",
+            "category": "XR, Interaction Toolkit",
+            "tags": "XR, VR UI",
+            "problem": "Unity VR UI Buttons not working",
+            "solution": "Set Canvas to World Space, add Tracked device Graphic Raycaster and use XR UI Input Module.",
+            "createdAt": "2026-05-18 10:21:14"
         }
     ]
 }
