@@ -117,6 +117,12 @@ public class KnowledgeSearchWindow : EditorWindow
         }
 
         GUILayout.EndHorizontal();
+        GUILayout.Space(10);
+
+        if (GUILayout.Button("Export Results"))
+        {
+            ExportResults();
+        }
 
         GUILayout.Space(15);
 
@@ -172,6 +178,12 @@ public class KnowledgeSearchWindow : EditorWindow
             return;
         }
         string query = searchQuery.ToLower();
+        // TOKENIZE QUERY
+        string[] tokens =
+            query.Split(
+            ' ',
+            System.StringSplitOptions.RemoveEmptyEntries
+            );
         if (string.IsNullOrWhiteSpace(query))
         {
             Debug.Log("Empty search query");
@@ -189,61 +201,91 @@ public class KnowledgeSearchWindow : EditorWindow
             // =========================
             // TITLE
             // =========================
-            if (entry.title.ToLower().Contains(query))
+            foreach (string token in tokens)
             {
-                match = true;
+                if (entry.title.ToLower().Contains(token))
+                {
+                    match = true;
 
-                score += 5;
+                    score += 5;
 
-                entry.matchedFields.Add("Title");
+                    if (!entry.matchedFields.Contains("Title"))
+                    {
+                        entry.matchedFields.Add("Title");
+                    }
+                }
             }
 
             // =========================
             // TAGS
             // =========================
-            if (entry.tags.ToLower().Contains(query))
+            foreach (string token in tokens)
             {
-                match = true;
+                if (entry.tags.ToLower().Contains(token))
+                {
+                    match = true;
 
-                score += 4;
+                    score += 4;
 
-                entry.matchedFields.Add("Tags");
+                    if (!entry.matchedFields.Contains("Tags"))
+                    {
+                        entry.matchedFields.Add("Tags");
+                    }
+                }
             }
 
             // =========================
             // CATEGORY
             // =========================
-            if (entry.category.ToLower().Contains(query))
+            foreach (string token in tokens)
             {
-                match = true;
+                if (entry.category.ToLower().Contains(token))
+                {
+                    match = true;
 
-                score += 3;
+                    score += 3;
 
-                entry.matchedFields.Add("Category");
+                    if (!entry.matchedFields.Contains("Category"))
+                    {
+                        entry.matchedFields.Add("Category");
+                    }
+                }
             }
 
             // =========================
             // PROBLEM
             // =========================
-            if (entry.problem.ToLower().Contains(query))
+            foreach (string token in tokens)
             {
-                match = true;
+                if (entry.problem.ToLower().Contains(token))
+                {
+                    match = true;
 
-                score += 2;
+                    score += 2;
 
-                entry.matchedFields.Add("Problem");
+                    if (!entry.matchedFields.Contains("Problem"))
+                    {
+                        entry.matchedFields.Add("Problem");
+                    }
+                }
             }
 
             // =========================
             // SOLUTION
             // =========================
-            if (entry.solution.ToLower().Contains(query))
+            foreach (string token in tokens)
             {
-                match = true;
+                if (entry.solution.ToLower().Contains(token))
+                {
+                    match = true;
 
-                score += 1;
+                    score += 1;
 
-                entry.matchedFields.Add("Solution");
+                    if (!entry.matchedFields.Contains("Solution"))
+                    {
+                        entry.matchedFields.Add("Solution");
+                    }
+                }
             }
 
             // =========================
@@ -719,6 +761,64 @@ public class KnowledgeSearchWindow : EditorWindow
         }
 
         return highlightedText;
+    }
+    void ExportResults()
+    {
+        if (searchResults.Count == 0)
+        {
+            Debug.Log("No search results to export");
+            return;
+        }
+
+        string exportPath =
+            Path.Combine(
+                Application.dataPath,
+                "knowledge_export.txt"
+            );
+
+        List<string> lines =
+            new List<string>();
+
+        foreach (var entry in searchResults)
+        {
+            lines.Add(
+                "=================================="
+            );
+
+            lines.Add($"ID: {entry.id}");
+
+            lines.Add($"Title: {entry.title}");
+
+            lines.Add($"Category: {entry.category}");
+
+            lines.Add($"Tags: {entry.tags}");
+
+            lines.Add($"Problem: {entry.problem}");
+
+            lines.Add($"Solution: {entry.solution}");
+
+            lines.Add(
+                $"Relevance Score: {entry.relevanceScore}"
+            );
+
+            lines.Add(
+                $"Matched Fields: {string.Join(", ", entry.matchedFields)}"
+            );
+
+            lines.Add(
+                $"Created: {entry.createdAt}"
+            );
+
+            lines.Add("");
+        }
+
+        File.WriteAllLines(exportPath, lines);
+
+        AssetDatabase.Refresh();
+
+        Debug.Log(
+            $"Exported Results: {exportPath}"
+        );
     }
     // =========================================
     // DATA MODEL

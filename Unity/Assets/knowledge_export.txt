@@ -1,0 +1,110 @@
+==================================
+ID: KB-0001
+Title: XR UI Flickering
+Category: UI
+Tags: XR,UI
+Problem: Canvas flickering in VR UI
+Solution: Changed render mode to World Space and also adjusted canvas position
+Relevance Score: 9
+Matched Fields: Title, Tags
+Created: 2026-05-12 10:15:56
+
+==================================
+ID: KB-0002
+Title: XR Controller Lag
+Category: Performance
+Tags: XR,Optimization
+Problem: Controller tracking jitter
+Solution: Reduced update polling frequency
+Relevance Score: 9
+Matched Fields: Title, Tags
+Created: 2026-05-13 09:29:40
+
+==================================
+ID: KB-0005
+Title: Low FPS in XR Scene
+Category: Performance
+Tags: XR,FPS,Optimization
+Problem: Frame drops in dense environments
+Solution: Reduced real-time lighting and shadows
+Relevance Score: 9
+Matched Fields: Title, Tags
+Created: 2026-05-13 10:45:08
+
+==================================
+ID: KB-0007
+Title: UI Button Not Clickable
+Category: UI
+Tags: XR,UI,Input
+Problem: XR ray interactor not triggering button
+Solution: Enabled graphic raycaster component
+Relevance Score: 6
+Matched Fields: Tags, Problem
+Created: 2026-05-13 11:18:55
+
+==================================
+ID: KB-0010
+Title: Controller Vibration Missing
+Category: Input
+Tags: XR,Haptics
+Problem: Haptic feedback not triggering
+Solution: Updated XR input action bindings
+Relevance Score: 5
+Matched Fields: Tags, Solution
+Created: 2026-05-13 12:16:44
+
+==================================
+ID: KB-0003
+Title: Hand Tracking Delay
+Category: Tracking
+Tags: XR,HandTracking
+Problem: Delayed hand response during movement
+Solution: Optimized hand tracking update loop
+Relevance Score: 4
+Matched Fields: Tags
+Created: 2026-05-13 10:05:12
+
+==================================
+ID: KB-0004
+Title: VR Audio Distortion
+Category: Audio
+Tags: XR,Audio
+Problem: Spatial audio distortion in headset
+Solution: Adjusted audio spatial blend settings
+Relevance Score: 4
+Matched Fields: Tags
+Created: 2026-05-13 10:22:34
+
+==================================
+ID: KB-0006
+Title: Teleportation Not Working
+Category: Gameplay
+Tags: XR,Locomotion
+Problem: Teleport ray not detecting surfaces
+Solution: Updated interaction layer masks
+Relevance Score: 4
+Matched Fields: Tags
+Created: 2026-05-13 11:02:17
+
+==================================
+ID: KB-0008
+Title: Headset Rotation Drift
+Category: Tracking
+Tags: XR,Tracking
+Problem: Camera slowly drifting during runtime
+Solution: Recalibrated tracking origin mode
+Relevance Score: 4
+Matched Fields: Tags
+Created: 2026-05-13 11:37:41
+
+==================================
+ID: KB-0009
+Title: Scene Loading Freeze
+Category: Performance
+Tags: XR,Loading
+Problem: Application freezing during scene transition
+Solution: Implemented async scene loading
+Relevance Score: 4
+Matched Fields: Tags
+Created: 2026-05-13 11:58:09
+
