@@ -1,6 +1,0 @@
-ollama
-langchain
-python-dotenv
-pydantic
-fastapi
-uvicorn
