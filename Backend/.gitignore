@@ -10,3 +10,5 @@ wheels/
 .venv
 product.model.py
 .env
+gen_embed.py
+data

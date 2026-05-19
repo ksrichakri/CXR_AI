@@ -9,7 +9,6 @@ class Entry(BaseModel):
                         max_length = 50,
                         description="Title of entry")
     category: str = Field(...,
-                          min_length = 5,
                           description="Category of problem")
     problem: str = Field(...,
                          min_length = 10 , 
