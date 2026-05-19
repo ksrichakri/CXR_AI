@@ -1,7 +1,8 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Collections.Generic;
+using UnityEditor;
+using UnityEditor.PackageManager.UI;
+using UnityEngine;
 
 public class KnowledgeSearchWindow : EditorWindow
 {
@@ -14,6 +15,12 @@ public class KnowledgeSearchWindow : EditorWindow
         new List<string>();
     private List<string> favoriteQueries =
         new List<string>();
+    private int totalEntries = 0;
+
+    private string topTag = "None";
+    private Dictionary<string, int>
+        categoryStats =
+        new Dictionary<string, int>();
     // COLLAPSIBLE STATE
     private Dictionary<string, bool> expandedEntries =
         new Dictionary<string, bool>();
@@ -49,9 +56,13 @@ public class KnowledgeSearchWindow : EditorWindow
     [MenuItem("Tools/Knowledge Search")]
     public static void ShowWindow()
     {
-        GetWindow<KnowledgeSearchWindow>(
-            "Knowledge Search"
-        );
+        var window =
+            GetWindow<KnowledgeSearchWindow>(
+                "Knowledge Search"
+            );
+
+        window.minSize =
+            new Vector2(500, 800);
     }
 
     private void OnEnable()
@@ -60,18 +71,21 @@ public class KnowledgeSearchWindow : EditorWindow
             Application.dataPath,
             "knowledge.json"
         );
-
-        // RICH TEXT STYLE
-        richLabelStyle =
-            new GUIStyle(EditorStyles.label);
-
-        richLabelStyle.richText = true;
-
-        richLabelStyle.wordWrap = true;
     }
 
     private void OnGUI()
     {
+        // SAFE GUI STYLE INIT
+        if (richLabelStyle == null)
+        {
+            richLabelStyle =
+                new GUIStyle(EditorStyles.label);
+
+            richLabelStyle.richText = true;
+
+            richLabelStyle.wordWrap = true;
+        }
+
         GUILayout.Label(
             "Knowledge Search",
             EditorStyles.boldLabel
@@ -105,23 +119,34 @@ public class KnowledgeSearchWindow : EditorWindow
 
         GUILayout.Space(10);
 
+        // =========================
         // BUTTONS
+        // =========================
         GUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Search"))
+        if (GUILayout.Button(
+            "Search",
+            GUILayout.Height(35)
+        ))
         {
             SearchKnowledge();
         }
 
-        if (GUILayout.Button("Clear"))
+        if (GUILayout.Button(
+            "Clear",
+            GUILayout.Height(35)
+        ))
         {
             searchQuery = "";
             searchResults.Clear();
         }
 
         GUILayout.EndHorizontal();
+
         GUILayout.Space(5);
 
+        // =========================
+        // SAVE FAVORITE SEARCH
+        // =========================
         if (GUILayout.Button("Save Current Search"))
         {
             if (!string.IsNullOrWhiteSpace(searchQuery))
@@ -136,17 +161,35 @@ public class KnowledgeSearchWindow : EditorWindow
                 }
             }
         }
+
         GUILayout.Space(10);
 
-        if (GUILayout.Button("Export Results"))
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button(
+            "Export TXT",
+            GUILayout.Height(30)
+        ))
         {
             ExportResults();
         }
+
+        if (GUILayout.Button(
+            "Export CSV",
+            GUILayout.Height(30)
+        ))
+        {
+            ExportCSV();
+        }
+
+        GUILayout.EndHorizontal();
+
         // =========================
         // SEARCH HISTORY
         // =========================
         if (searchHistory.Count > 0)
         {
+            GUILayout.BeginVertical("box");
             GUILayout.Label(
                 "Recent Searches",
                 EditorStyles.boldLabel
@@ -174,12 +217,15 @@ public class KnowledgeSearchWindow : EditorWindow
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10);
+            GUILayout.EndVertical();
         }
+
         // =========================
         // FAVORITE QUERIES
         // =========================
         if (favoriteQueries.Count > 0)
         {
+            GUILayout.BeginVertical("box");
             GUILayout.Label(
                 "Favorite Queries",
                 EditorStyles.boldLabel
@@ -207,10 +253,66 @@ public class KnowledgeSearchWindow : EditorWindow
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10);
+            GUILayout.EndVertical();
         }
+
+        // =========================
+        // ANALYTICS PANEL
+        // =========================
+        GUILayout.BeginVertical("box");
+
+        GUILayout.Label(
+            "Retrieval Analytics",
+            EditorStyles.boldLabel
+        );
+        GUILayout.Space(5);
+        GUILayout.Label(
+            $"Total Entries: {totalEntries}"
+        );
+
+        GUILayout.Label(
+            $"Search Results: {searchResults.Count}"
+        );
+
+        GUILayout.Label(
+            $"Favorite Queries: {favoriteQueries.Count}"
+        );
+
+        GUILayout.Label(
+            $"Most Used Tag: {topTag}"
+        );
+
+        GUILayout.EndVertical();
+
+        // =========================
+        // KNOWLEDGE STATISTICS
+        // =========================
+        GUILayout.BeginVertical("box");
+
+        GUILayout.Label(
+            "Knowledge Statistics",
+            EditorStyles.boldLabel
+        );
+
+        GUILayout.Space(5);
+
+        foreach (var pair in categoryStats)
+        {
+            GUILayout.Label(
+                $"{pair.Key} Entries: {pair.Value}"
+            );
+        }
+
+        GUILayout.EndVertical();
+
         GUILayout.Space(15);
 
+
+        GUILayout.Space(15);
+
+        // =========================
         // RESULT COUNT
+        // =========================
         GUILayout.Label(
             $"Results ({searchResults.Count})",
             EditorStyles.boldLabel
@@ -218,10 +320,12 @@ public class KnowledgeSearchWindow : EditorWindow
 
         GUILayout.Space(5);
 
+        // =========================
         // SCROLL VIEW
+        // =========================
         scrollPosition = GUILayout.BeginScrollView(
             scrollPosition,
-            GUILayout.ExpandHeight(true)
+            GUILayout.Height(position.height - 500)
         );
 
         foreach (var entry in searchResults)
@@ -231,7 +335,6 @@ public class KnowledgeSearchWindow : EditorWindow
 
         GUILayout.EndScrollView();
     }
-
     // =========================================
     // SEARCH LOGIC
     // =========================================
@@ -252,6 +355,68 @@ public class KnowledgeSearchWindow : EditorWindow
 
         Wrapper data =
             JsonUtility.FromJson<Wrapper>(json);
+
+        // TOTAL ENTRIES
+        totalEntries = data.entries.Count;
+
+        // TAG ANALYTICS
+        Dictionary<string, int> tagCounts =
+            new Dictionary<string, int>();
+
+        foreach (var entry in data.entries)
+        {
+            string[] tags =
+                entry.tags.Split(',');
+
+            foreach (string rawTag in tags)
+            {
+                string tag = rawTag.Trim();
+
+                if (string.IsNullOrEmpty(tag))
+                    continue;
+
+                if (!tagCounts.ContainsKey(tag))
+                {
+                    tagCounts[tag] = 0;
+                }
+
+                tagCounts[tag]++;
+            }
+        }
+
+        // FIND TOP TAG
+        int maxCount = 0;
+
+        topTag = "None";
+
+        // CATEGORY STATISTICS
+        categoryStats.Clear();
+
+        foreach (var entry in data.entries)
+        {
+            string category =
+                entry.category.Trim();
+
+            if (string.IsNullOrEmpty(category))
+                continue;
+
+            if (!categoryStats.ContainsKey(category))
+            {
+                categoryStats[category] = 0;
+            }
+
+            categoryStats[category]++;
+        }
+
+        foreach (var pair in tagCounts)
+        {
+            if (pair.Value > maxCount)
+            {
+                maxCount = pair.Value;
+
+                topTag = pair.Key;
+            }
+        }
 
         if (data == null ||
             data.entries == null)
@@ -912,6 +1077,55 @@ public class KnowledgeSearchWindow : EditorWindow
 
         Debug.Log(
             $"Exported Results: {exportPath}"
+        );
+    }
+    void ExportCSV()
+    {
+        if (searchResults.Count == 0)
+        {
+            Debug.Log(
+                "No search results to export"
+            );
+
+            return;
+        }
+
+        string exportPath =
+            Path.Combine(
+                Application.dataPath,
+                "knowledge_export.csv"
+            );
+
+        List<string> lines =
+            new List<string>();
+
+        // CSV HEADER
+        lines.Add(
+            "ID,Title,Category,Tags,Problem,Solution,RelevanceScore,MatchedFields,CreatedAt"
+        );
+
+        foreach (var entry in searchResults)
+        {
+            string line =
+                $"\"{entry.id}\"," +
+                $"\"{entry.title}\"," +
+                $"\"{entry.category}\"," +
+                $"\"{entry.tags}\"," +
+                $"\"{entry.problem}\"," +
+                $"\"{entry.solution}\"," +
+                $"\"{entry.relevanceScore}\"," +
+                $"\"{string.Join(" | ", entry.matchedFields)}\"," +
+                $"\"{entry.createdAt}\"";
+
+            lines.Add(line);
+        }
+
+        File.WriteAllLines(exportPath, lines);
+
+        AssetDatabase.Refresh();
+
+        Debug.Log(
+            $"CSV Exported: {exportPath}"
         );
     }
     // =========================================

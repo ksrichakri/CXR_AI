@@ -1,0 +1,12 @@
+ID,Title,Category,Tags,Problem,Solution,RelevanceScore,MatchedFields,CreatedAt
+"KB-0001","XR UI Flickering","UI","XR,UI","Canvas flickering in VR UI","Changed render mode to World Space and also adjusted canvas position","9","Title | Tags","2026-05-12 10:15:56"
+"KB-0002","XR Controller Lag","Performance","XR,Optimization","Controller tracking jitter","Reduced update polling frequency","9","Title | Tags","2026-05-13 09:29:40"
+"KB-0005","Low FPS in XR Scene","Performance","XR,FPS,Optimization","Frame drops in dense environments","Reduced real-time lighting and shadows","9","Title | Tags","2026-05-13 10:45:08"
+"KB-0011","UI Button not visible and working properly","XR, Interaction Toolkit","XR, VR UI","Unity VR UI Buttons not working","Set Canvas to World Space, add Tracked device Graphic Raycaster and use XR UI Input Module.","8","Tags | Category | Solution","2026-05-18 10:21:14"
+"KB-0007","UI Button Not Clickable","UI","XR,UI,Input","XR ray interactor not triggering button","Enabled graphic raycaster component","6","Tags | Problem","2026-05-13 11:18:55"
+"KB-0010","Controller Vibration Missing","Input","XR,Haptics","Haptic feedback not triggering","Updated XR input action bindings","5","Tags | Solution","2026-05-13 12:16:44"
+"KB-0003","Hand Tracking Delay","Tracking","XR,HandTracking","Delayed hand response during movement","Optimized hand tracking update loop","4","Tags","2026-05-13 10:05:12"
+"KB-0004","VR Audio Distortion","Audio","XR,Audio","Spatial audio distortion in headset","Adjusted audio spatial blend settings","4","Tags","2026-05-13 10:22:34"
+"KB-0006","Teleportation Not Working","Gameplay","XR,Locomotion","Teleport ray not detecting surfaces","Updated interaction layer masks","4","Tags","2026-05-13 11:02:17"
+"KB-0008","Headset Rotation Drift","Tracking","XR,Tracking","Camera slowly drifting during runtime","Recalibrated tracking origin mode","4","Tags","2026-05-13 11:37:41"
+"KB-0009","Scene Loading Freeze","Performance","XR,Loading","Application freezing during scene transition","Implemented async scene loading","4","Tags","2026-05-13 11:58:09"
