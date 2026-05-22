@@ -17,6 +17,9 @@ def db_con():
     finally:
         db.close()
 
+@app.get("/")
+def greet():
+    return "Welcome to CXR's LLM"
 @app.get("/query",response_model=list[EntryResponse])
 def fetch(db:Session = Depends(db_con)):
     db_prod = db.query(Entry_Model).all()
@@ -66,4 +69,15 @@ def delete_query(id:str , db: Session = Depends(db_con)):
     else:
         return {"message":"Entry not found"}
 
+@app.post("/search",response_model=list[EntryResponse])
+def sem_search(search_query: SearchQuery, db:Session = Depends(db_con)):
+    
+    query_embedding = generate_embedding(search_query.query)
+    
+    results = db.query(
+        Entry_Model,
+        (Entry_Model.embedding.cosine_distance(query_embedding)).label('similarity')
+    ).order_by('similarity').all()
+    
+    return [result[0] for result in results]
     
