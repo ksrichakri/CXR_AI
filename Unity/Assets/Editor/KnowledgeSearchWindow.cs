@@ -335,11 +335,44 @@ public class KnowledgeSearchWindow : EditorWindow
 
         GUILayout.EndScrollView();
     }
+
+    void GenerateSearchRequestPayload()
+    {
+        SearchRequest request =
+            new SearchRequest();
+
+        request.query =
+            searchQuery;
+
+        request.filter =
+            filters[filterIndex];
+
+        request.sort =
+            sortOptions[sortIndex];
+
+        request.timestamp =
+            System.DateTime.Now.ToString(
+                "yyyy-MM-dd HH:mm:ss"
+            );
+
+        string json =
+            JsonUtility.ToJson(
+                request,
+                true
+            );
+
+        Debug.Log(
+            "SEARCH REQUEST JSON:\n" +
+            json
+        );
+    }
+
     // =========================================
     // SEARCH LOGIC
     // =========================================
     void SearchKnowledge()
     {
+        GenerateSearchRequestPayload();
         searchResults.Clear();
 
         if (!File.Exists(filePath))
@@ -850,7 +883,10 @@ public class KnowledgeSearchWindow : EditorWindow
                     );
                 }
             }
-
+            if (GUILayout.Button("Generate API JSON"))
+            {
+                GenerateBackendPayload(entry);
+            }
             // =========================
             // DELETE BUTTON
             // =========================
@@ -1079,6 +1115,59 @@ public class KnowledgeSearchWindow : EditorWindow
             $"Exported Results: {exportPath}"
         );
     }
+
+    BackendEntry ConvertToBackendEntry(
+    Entry entry
+)
+    {
+        BackendEntry backendEntry =
+            new BackendEntry();
+
+        backendEntry.id =
+            entry.id;
+
+        backendEntry.title =
+            entry.title;
+
+        backendEntry.category =
+            entry.category;
+
+        backendEntry.problem =
+            entry.problem;
+
+        backendEntry.solution =
+            entry.solution;
+
+        backendEntry.codeSnippet = "";
+
+        // CONVERT TAGS STRING → LIST
+        backendEntry.tags =
+            new List<string>(
+                entry.tags.Split(',')
+            );
+
+        return backendEntry;
+    }
+
+    void GenerateBackendPayload(
+    Entry entry
+    )
+    {
+        BackendEntry backendEntry =
+            ConvertToBackendEntry(entry);
+
+        string json =
+            JsonUtility.ToJson(
+                backendEntry,
+                true
+            );
+
+        Debug.Log(
+            "BACKEND PAYLOAD:\n" +
+            json
+        );
+    }
+
     void ExportCSV()
     {
         if (searchResults.Count == 0)
@@ -1152,6 +1241,36 @@ public class KnowledgeSearchWindow : EditorWindow
         [System.NonSerialized]
         public List<string> matchedFields =
         new List<string>();
+    }
+
+    [System.Serializable]
+    public class BackendEntry
+    {
+        public string id;
+
+        public string title;
+
+        public string category;
+
+        public string problem;
+
+        public string solution;
+
+        public string codeSnippet;
+
+        public List<string> tags;
+    }
+
+    [System.Serializable]
+    public class SearchRequest
+    {
+        public string query;
+
+        public string filter;
+
+        public string sort;
+
+        public string timestamp;
     }
 
     [System.Serializable]
