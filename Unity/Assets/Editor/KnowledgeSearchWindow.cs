@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using UnityEngine.Networking;
+using System.Text;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.PackageManager.UI;
@@ -367,12 +369,86 @@ public class KnowledgeSearchWindow : EditorWindow
         );
     }
 
+    async void SendSearchRequestToBackend()
+    {
+        SearchRequest request =
+            new SearchRequest();
+
+        request.query = searchQuery;
+
+        request.filter =
+            filters[filterIndex];
+
+        request.sort =
+            sortOptions[sortIndex];
+
+        request.timestamp =
+            System.DateTime.Now.ToString(
+                "yyyy-MM-dd HH:mm:ss"
+            );
+
+        string json =
+            JsonUtility.ToJson(
+                request,
+                true
+            );
+
+        Debug.Log(
+            "SENDING TO BACKEND:\n" +
+            json
+        );
+
+        byte[] bodyRaw =
+            Encoding.UTF8.GetBytes(json);
+
+        UnityWebRequest webRequest =
+            new UnityWebRequest(
+                "http://127.0.0.1:8000/search",
+                "POST"
+            );
+
+        webRequest.uploadHandler =
+            new UploadHandlerRaw(bodyRaw);
+
+        webRequest.downloadHandler =
+            new DownloadHandlerBuffer();
+
+        webRequest.SetRequestHeader(
+            "Content-Type",
+            "application/json"
+        );
+
+        var operation =
+            webRequest.SendWebRequest();
+
+        while (!operation.isDone)
+        {
+            await System.Threading.Tasks.Task.Yield();
+        }
+
+        if (webRequest.result ==
+            UnityWebRequest.Result.Success)
+        {
+            Debug.Log(
+                "BACKEND RESPONSE:\n" +
+                webRequest.downloadHandler.text
+            );
+        }
+        else
+        {
+            Debug.LogError(
+                "BACKEND ERROR:\n" +
+                webRequest.error
+            );
+        }
+    }
+
     // =========================================
     // SEARCH LOGIC
     // =========================================
     void SearchKnowledge()
     {
-        GenerateSearchRequestPayload();
+        SendSearchRequestToBackend();
         searchResults.Clear();
 
         if (!File.Exists(filePath))
@@ -1271,6 +1347,12 @@ public class KnowledgeSearchWindow : EditorWindow
         public string sort;
 
         public string timestamp;
+    }
+
+    [System.Serializable]
+    public class BackendResponse
+    {
+        public List<Entry> results;
     }
 
     [System.Serializable]
