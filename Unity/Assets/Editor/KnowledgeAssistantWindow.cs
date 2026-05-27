@@ -1,3 +1,6 @@
+using UnityEngine.Networking;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using System.IO;
@@ -13,7 +16,10 @@ public class KnowledgeAssistantWindow : EditorWindow
     private string solution = "";
 
     private string filePath;
+    private const string API_URL =
+        "http://127.0.0.1:8000/query";
 
+    private bool sendToBackend = true;
     [MenuItem("Tools/Knowledge Assistant")]
     public static void ShowWindow()
     {
@@ -36,6 +42,14 @@ public class KnowledgeAssistantWindow : EditorWindow
         category = EditorGUILayout.TextField("Category", category);
 
         tags = EditorGUILayout.TextField("Tags", tags);
+
+        GUILayout.Space(5);
+
+        sendToBackend =
+            EditorGUILayout.Toggle(
+                "Send To Backend",
+                sendToBackend
+            );
 
         GUILayout.Space(5);
 
@@ -108,12 +122,110 @@ public class KnowledgeAssistantWindow : EditorWindow
 
         Debug.Log($"Knowledge Entry Saved: {generatedID}");
 
+        if (sendToBackend)
+        {
+            SendEntryToBackend(newEntry);
+        }
+
         // CLEAR FORM
         entryTitle = "";
         category = "";
         tags = "";
         problem = "";
         solution = "";
+    }
+
+    async void SendEntryToBackend(
+    Entry entry
+)
+    {
+        BackendEntry backendEntry =
+            new BackendEntry();
+
+        backendEntry.id =
+            entry.id;
+
+        backendEntry.title =
+            entry.title;
+
+        backendEntry.category =
+            entry.category;
+
+        backendEntry.problem =
+            entry.problem;
+
+        backendEntry.solution =
+            entry.solution;
+
+        backendEntry.codeSnippet = "";
+
+        backendEntry.tags =
+            new List<string>();
+
+        foreach (string tag in entry.tags.Split(','))
+        {
+            backendEntry.tags.Add(tag.Trim());
+        }
+
+        string json =
+            JsonUtility.ToJson(
+                backendEntry,
+                true
+            );
+
+        Debug.Log(
+            "SENDING ENTRY TO BACKEND:\n" +
+            json
+        );
+
+        byte[] bodyRaw =
+            Encoding.UTF8.GetBytes(json);
+
+        UnityWebRequest request =
+            new UnityWebRequest(
+                API_URL,
+                "POST"
+            );
+
+        request.uploadHandler =
+            new UploadHandlerRaw(bodyRaw);
+
+        request.downloadHandler =
+            new DownloadHandlerBuffer();
+
+        request.SetRequestHeader(
+            "Content-Type",
+            "application/json"
+        );
+
+        var operation =
+            request.SendWebRequest();
+
+        while (!operation.isDone)
+        {
+            await Task.Yield();
+        }
+
+        if (request.result ==
+            UnityWebRequest.Result.Success)
+        {
+            Debug.Log(
+                "Backend Entry Saved Successfully"
+            );
+
+            Debug.Log(
+                request.downloadHandler.text
+            );
+        }
+        else
+        {
+            Debug.LogError(
+                "BACKEND ERROR:\n" +
+                request.responseCode +
+                "\n" +
+                request.downloadHandler.text
+            );
+        }
     }
 
     // =========================================
@@ -143,6 +255,24 @@ public class KnowledgeAssistantWindow : EditorWindow
         public string solution;
 
         public string createdAt;
+    }
+
+    [System.Serializable]
+    public class BackendEntry
+    {
+        public string id;
+
+        public string title;
+
+        public string category;
+
+        public List<string> tags;
+
+        public string problem;
+
+        public string solution;
+
+        public string codeSnippet;
     }
 
     // =========================================

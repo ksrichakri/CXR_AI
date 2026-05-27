@@ -11,7 +11,6 @@ public class KnowledgeSearchWindow : EditorWindow
     private string searchQuery = "";
 
     private List<Entry> searchResults = new List<Entry>();
-
     private Vector2 scrollPosition;
     private List<string> searchHistory =
         new List<string>();
@@ -54,6 +53,7 @@ public class KnowledgeSearchWindow : EditorWindow
     private string filePath;
 
     private GUIStyle richLabelStyle;
+    private bool useBackendSearch = true;
 
     [MenuItem("Tools/Knowledge Search")]
     public static void ShowWindow()
@@ -100,6 +100,14 @@ public class KnowledgeSearchWindow : EditorWindow
             "Search",
             searchQuery
         );
+
+        GUILayout.Space(10);
+
+        useBackendSearch =
+            EditorGUILayout.Toggle(
+            "Use Backend Search",
+            useBackendSearch
+            );
 
         GUILayout.Space(10);
 
@@ -429,27 +437,66 @@ public class KnowledgeSearchWindow : EditorWindow
         if (webRequest.result ==
             UnityWebRequest.Result.Success)
         {
+            string responseJson =
+                webRequest.downloadHandler.text;
+
             Debug.Log(
                 "BACKEND RESPONSE:\n" +
-                webRequest.downloadHandler.text
+                responseJson
             );
+
+            string wrappedJson =
+                "{ \"entries\": " +
+                responseJson +
+                "}";
+
+            BackendEntryList parsedResults =
+                JsonUtility.FromJson<BackendEntryList>(
+                    wrappedJson
+                );
+
+            if (parsedResults != null &&
+                parsedResults.entries != null)
+            {
+                searchResults.Clear();
+
+                foreach (var result in parsedResults.entries)
+                {
+                    searchResults.Add(result);
+                }
+
+                Repaint();
+
+                Debug.Log(
+                    $"Backend Returned: {searchResults.Count} result(s)"
+                );
+            }
+
+            
         }
         else
         {
             Debug.LogError(
                 "BACKEND ERROR:\n" +
-                webRequest.error
+                "Status Code: " +
+                webRequest.responseCode +
+                "\nResponse:\n" +
+                webRequest.downloadHandler.text
             );
         }
     }
-
     // =========================================
     // SEARCH LOGIC
     // =========================================
     void SearchKnowledge()
     {
-        SendSearchRequestToBackend();
         searchResults.Clear();
+
+        if (useBackendSearch)
+        {
+            SendSearchRequestToBackend();
+            return;
+        }
 
         if (!File.Exists(filePath))
         {
@@ -1218,9 +1265,12 @@ public class KnowledgeSearchWindow : EditorWindow
 
         // CONVERT TAGS STRING → LIST
         backendEntry.tags =
-            new List<string>(
-                entry.tags.Split(',')
-            );
+            new List<string>();
+
+        foreach (string tag in entry.tags.Split(','))
+        {
+            backendEntry.tags.Add(tag.Trim());
+        }
 
         return backendEntry;
     }
@@ -1350,9 +1400,9 @@ public class KnowledgeSearchWindow : EditorWindow
     }
 
     [System.Serializable]
-    public class BackendResponse
+    public class BackendEntryList
     {
-        public List<Entry> results;
+        public List<Entry> entries;
     }
 
     [System.Serializable]
