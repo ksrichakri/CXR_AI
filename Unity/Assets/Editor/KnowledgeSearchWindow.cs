@@ -54,7 +54,10 @@ public class KnowledgeSearchWindow : EditorWindow
 
     private GUIStyle richLabelStyle;
     private bool useBackendSearch = true;
-
+    private bool isSearching = false;
+    private string backendStatus = "Unknown";
+    private string backendErrorMessage = "";
+    private string lastSynced = "Never";
     [MenuItem("Tools/Knowledge Search")]
     public static void ShowWindow()
     {
@@ -111,6 +114,27 @@ public class KnowledgeSearchWindow : EditorWindow
 
         GUILayout.Space(10);
 
+        if (isSearching)
+        {
+            EditorGUILayout.HelpBox(
+                "Searching Backend...",
+                MessageType.Info
+            );
+        }
+        GUILayout.Label(
+            $"Backend Status: {backendStatus}"
+        );
+        GUILayout.Label(
+            $"Last Synced: {lastSynced}"
+        );
+        if (!string.IsNullOrEmpty(
+            backendErrorMessage))
+        {
+            EditorGUILayout.HelpBox(
+                backendErrorMessage,
+                MessageType.Error
+            );
+        }
         // FILTER DROPDOWN
         filterIndex = EditorGUILayout.Popup(
             "Filter By",
@@ -334,8 +358,7 @@ public class KnowledgeSearchWindow : EditorWindow
         // SCROLL VIEW
         // =========================
         scrollPosition = GUILayout.BeginScrollView(
-            scrollPosition,
-            GUILayout.Height(position.height - 500)
+            scrollPosition
         );
 
         foreach (var entry in searchResults)
@@ -379,6 +402,9 @@ public class KnowledgeSearchWindow : EditorWindow
 
     async void SendSearchRequestToBackend()
     {
+        isSearching = true;
+        backendErrorMessage = "";
+        Repaint();
         SearchRequest request =
             new SearchRequest();
 
@@ -470,6 +496,12 @@ public class KnowledgeSearchWindow : EditorWindow
                 Debug.Log(
                     $"Backend Returned: {searchResults.Count} result(s)"
                 );
+                backendStatus = "Connected";
+                backendErrorMessage = "";
+                lastSynced =
+                    System.DateTime.Now.ToString(
+                        "HH:mm:ss"
+                    );
             }
 
             
@@ -483,7 +515,13 @@ public class KnowledgeSearchWindow : EditorWindow
                 "\nResponse:\n" +
                 webRequest.downloadHandler.text
             );
+            backendStatus = "Offline";
+            backendErrorMessage =
+                "Backend unavailable";
         }
+        isSearching = false;
+        Repaint();
+        
     }
     // =========================================
     // SEARCH LOGIC
@@ -511,9 +549,14 @@ public class KnowledgeSearchWindow : EditorWindow
 
         Wrapper data =
             JsonUtility.FromJson<Wrapper>(json);
-
-        // TOTAL ENTRIES
-        totalEntries = data.entries.Count;
+        if (data == null ||
+            data.entries == null)
+        {
+            Debug.LogError(
+                "No entries found"
+            );
+            return;
+        }
 
         // TAG ANALYTICS
         Dictionary<string, int> tagCounts =
@@ -574,14 +617,9 @@ public class KnowledgeSearchWindow : EditorWindow
             }
         }
 
-        if (data == null ||
-            data.entries == null)
-        {
-            Debug.LogError(
-                "No entries found"
-            );
-            return;
-        }
+        
+        // TOTAL ENTRIES
+        totalEntries = data.entries.Count;
         string query = searchQuery.ToLower();
         // TOKENIZE QUERY
         string[] tokens =

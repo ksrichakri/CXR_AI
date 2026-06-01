@@ -98,6 +98,15 @@
             "problem": "Unity VR UI Buttons not working",
             "solution": "Set Canvas to World Space, add Tracked device Graphic Raycaster and use XR UI Input Module.",
             "createdAt": "2026-05-18 10:21:14"
+        },
+        {
+            "id": "KB-0012",
+            "title": "XR Controller Bug ",
+            "category": "XR",
+            "tags": "XR, Controller, Input",
+            "problem": "Controller not detected",
+            "solution": "Restart XR Interaction Toolkit",
+            "createdAt": "2026-05-29 10:19:54"
         }
     ]
 }
