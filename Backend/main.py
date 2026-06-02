@@ -1,13 +1,13 @@
 from fastapi import FastAPI,Depends,HTTPException
-from models.kbEntry import Entry
-from database.connection import SessionLocal,engine,Base
-from models.kbEntry_db import Entry_Model
-from models.kbEntry import Entry
-from models.searchQuery import SearchQuery
+from Backend.models.kbEntry import Entry
+from Backend.database.connection import SessionLocal,engine,Base
+from Backend.models.kbEntry_db import Entry_Model
+from Backend.models.kbEntry import Entry
+from Backend.models.searchQuery import SearchQuery
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from semantic_search_engine.app.embedder import generate_embedding
-from models.response import EntryResponse
+from Backend.semantic_search_engine.app.embedder import generate_embedding
+from Backend.models.response import EntryResponse
 app = FastAPI()
 Base.metadata.create_all(bind = engine)
 

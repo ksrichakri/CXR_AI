@@ -1,4 +1,4 @@
-from database.connection import Base
+from Backend.database.connection import Base
 from sqlalchemy import Column, String, Text,Integer
 from sqlalchemy.types import JSON
 from pgvector.sqlalchemy import Vector
