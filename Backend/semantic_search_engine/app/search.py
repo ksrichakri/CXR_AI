@@ -1,6 +1,7 @@
 from sqlalchemy import text
-from Backend.database.connection import SessionLocal
-from app.embedder import generate_embedding
+
+from database import SessionLocal
+from embedder import generate_embedding
 
 
 def semantic_search(query, top_k=5):

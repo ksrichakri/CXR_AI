@@ -1,0 +1,13 @@
+sqlalchemy
+pypdf
+pgvector
+psycopg2-binary
+sentence-transformers
+langchain
+langchain-text-splitters
+fastapi
+uvicorn
+pydantic
+python-dotenv
+ollama
+beautifulsoup4
