@@ -2,8 +2,6 @@ from pydantic import BaseModel , Field
 from typing import List , Optional
 
 class Entry(BaseModel):
-    id: str = Field(...,
-                    min_length = 5)
     title : str = Field(...,
                         min_length = 5,
                         max_length = 50,

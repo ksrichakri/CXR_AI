@@ -4,10 +4,7 @@ from typing import List
 
 class EntryResponse(BaseModel):
 
-    id: str = Field(
-        ...,
-        min_length=5
-    )
+    id: int = Field(...)
 
     title: str = Field(
         ...,
@@ -38,6 +35,9 @@ class EntryResponse(BaseModel):
     tags: List[str] = Field(
         default_factory=list
     )
-
+    
+    gen_answer: str = Field(
+        default= "Answer"
+    )
     class Config:
         from_attributes = True
