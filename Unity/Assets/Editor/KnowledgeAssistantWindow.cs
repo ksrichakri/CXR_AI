@@ -14,7 +14,7 @@ public class KnowledgeAssistantWindow : EditorWindow
     private string tags = "";
     private string problem = "";
     private string solution = "";
-
+    private string codeSnippet = "";
     private string filePath;
     private const string API_URL =
         "http://127.0.0.1:8000/query";
@@ -58,6 +58,14 @@ public class KnowledgeAssistantWindow : EditorWindow
 
         GUILayout.Space(5);
 
+        GUILayout.Label("Code Snippet");
+
+        codeSnippet =
+            EditorGUILayout.TextArea(
+                codeSnippet,
+                GUILayout.Height(60)
+            );
+
         GUILayout.Label("Solution");
         solution = EditorGUILayout.TextArea(solution, GUILayout.Height(80));
 
@@ -100,6 +108,7 @@ public class KnowledgeAssistantWindow : EditorWindow
             category = category,
             tags = tags,
             problem = problem,
+            codeSnippet = codeSnippet,
             solution = solution,
             createdAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
         };
@@ -142,9 +151,6 @@ public class KnowledgeAssistantWindow : EditorWindow
         BackendEntry backendEntry =
             new BackendEntry();
 
-        backendEntry.id =
-            entry.id;
-
         backendEntry.title =
             entry.title;
 
@@ -157,7 +163,8 @@ public class KnowledgeAssistantWindow : EditorWindow
         backendEntry.solution =
             entry.solution;
 
-        backendEntry.codeSnippet = "";
+        backendEntry.codeSnippet =
+            entry.codeSnippet;
 
         backendEntry.tags =
             new List<string>();
@@ -254,14 +261,14 @@ public class KnowledgeAssistantWindow : EditorWindow
 
         public string solution;
 
+        public string codeSnippet;
+
         public string createdAt;
     }
 
     [System.Serializable]
     public class BackendEntry
     {
-        public string id;
-
         public string title;
 
         public string category;

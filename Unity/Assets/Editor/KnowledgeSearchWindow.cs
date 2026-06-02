@@ -12,9 +12,9 @@ public class KnowledgeSearchWindow : EditorWindow
     private List<Entry> searchResults = new List<Entry>();
   
     // COLLAPSIBLE STATE
-    private Dictionary<string, bool> expandedEntries =
-        new Dictionary<string, bool>();
-    private string currentlyEditingID = "";
+    private Dictionary<int, bool> expandedEntries =
+        new Dictionary<int, bool>();
+    private int currentlyEditingID = -1;
 
     // FILTER SYSTEM
     private int filterIndex = 0;
@@ -266,8 +266,8 @@ public class KnowledgeSearchWindow : EditorWindow
 
             EditorGUILayout.EndScrollView();
         }
-        EditorGUILayout.EndScrollView();
         GUILayout.EndVertical();
+        EditorGUILayout.EndScrollView();
     }
         void GenerateSearchRequestPayload()
     {
@@ -283,10 +283,10 @@ public class KnowledgeSearchWindow : EditorWindow
         request.sort =
             sortOptions[sortIndex];
 
-        request.timestamp =
-            System.DateTime.Now.ToString(
-                "yyyy-MM-dd HH:mm:ss"
-            );
+        //request.timestamp =
+        //    System.DateTime.Now.ToString(
+        //        "yyyy-MM-dd HH:mm:ss"
+        //    );
 
         string json =
             JsonUtility.ToJson(
@@ -316,10 +316,10 @@ public class KnowledgeSearchWindow : EditorWindow
         request.sort =
             sortOptions[sortIndex];
 
-        request.timestamp =
-            System.DateTime.Now.ToString(
-                "yyyy-MM-dd HH:mm:ss"
-            );
+        //request.timestamp =
+        //    System.DateTime.Now.ToString(
+        //        "yyyy-MM-dd HH:mm:ss"
+        //    );
 
         string json =
             JsonUtility.ToJson(
@@ -492,7 +492,7 @@ public class KnowledgeSearchWindow : EditorWindow
             // =========================
             foreach (string token in tokens)
             {
-                if (entry.tags.ToLower().Contains(token))
+                if (string.Join(",", entry.tags).ToLower().Contains(token))
                 {
                     match = true;
 
@@ -576,7 +576,7 @@ public class KnowledgeSearchWindow : EditorWindow
 
                 case "Tags":
                     match =
-                        entry.tags.ToLower().Contains(query);
+                        string.Join(",", entry.tags).ToLower().Contains(query);
                     break;
 
                 case "Problem":
@@ -623,13 +623,6 @@ public class KnowledgeSearchWindow : EditorWindow
 
                 searchResults.Sort((a, b) =>
                     a.createdAt.CompareTo(b.createdAt));
-
-                break;
-
-            case "ID":
-
-                searchResults.Sort((a, b) =>
-                    a.id.CompareTo(b.id));
 
                 break;
 
@@ -703,9 +696,17 @@ public class KnowledgeSearchWindow : EditorWindow
                 );
 
                 GUILayout.Label("Tags");
-                entry.tags = EditorGUILayout.TextField(
-                    entry.tags
-                );
+
+                string tagsString =
+                    string.Join(",", entry.tags);
+
+                tagsString =
+                    EditorGUILayout.TextField(tagsString);
+
+                entry.tags =
+                    new List<string>(
+                        tagsString.Split(',')
+                    );
 
                 // DYNAMIC HEIGHTS
                 float problemHeight =
@@ -759,8 +760,8 @@ public class KnowledgeSearchWindow : EditorWindow
                 GUILayout.Label("Tags");
 
                 // SPLIT TAGS
-                string[] splitTags =
-                    entry.tags.Split(',');
+                List<string> splitTags =
+                    entry.tags;
 
                 // TAG BUTTON ROW
                 GUILayout.BeginHorizontal();
@@ -837,7 +838,7 @@ public class KnowledgeSearchWindow : EditorWindow
                 {
                     SaveEditedEntry(entry);
 
-                    currentlyEditingID = "";
+                    currentlyEditingID = -1;
 
                     Debug.Log(
                         $"Saved Changes: {entry.id}"
@@ -857,11 +858,10 @@ public class KnowledgeSearchWindow : EditorWindow
         }
 
         GUILayout.EndVertical();
-
-        GUILayout.Space(5);
+        GUILayout.Space(8);
     }
 
-    void DeleteEntry(string entryID)
+    void DeleteEntry(int entryID)
     {
 
         if (!File.Exists(filePath))
@@ -1041,7 +1041,7 @@ public class KnowledgeSearchWindow : EditorWindow
 
             lines.Add($"Category: {entry.category}");
 
-            lines.Add($"Tags: {entry.tags}");
+            lines.Add($"Tags: {string.Join(",", entry.tags)}");
 
             lines.Add($"Problem: {entry.problem}");
 
@@ -1091,10 +1091,8 @@ public class KnowledgeSearchWindow : EditorWindow
         backendEntry.tags =
             new List<string>();
 
-        foreach (string tag in entry.tags.Split(','))
-        {
-            backendEntry.tags.Add(tag.Trim());
-        }
+        backendEntry.tags =
+            new List<string>(entry.tags);
 
         return backendEntry;
     }
@@ -1148,7 +1146,7 @@ public class KnowledgeSearchWindow : EditorWindow
             string line =
                 $"\"{entry.title}\"," +
                 $"\"{entry.category}\"," +
-                $"\"{entry.tags}\"," +
+                $"\"{string.Join(",", entry.tags)}\"," +
                 $"\"{entry.problem}\"," +
                 $"\"{entry.solution}\"," +
                 $"\"{entry.createdAt}\"";
@@ -1170,13 +1168,13 @@ public class KnowledgeSearchWindow : EditorWindow
     [System.Serializable]
     public class Entry
     {
-        public string id;
+        public int id;
 
         public string title;
 
         public string category;
 
-        public string tags;
+        public List<string> tags;
 
         public string problem;
 
@@ -1215,7 +1213,7 @@ public class KnowledgeSearchWindow : EditorWindow
 
         public string sort;
 
-        public string timestamp;
+        //public string timestamp;
     }
 
     [System.Serializable]

@@ -7,6 +7,7 @@
             "tags": "XR,UI",
             "problem": "Canvas flickering in VR UI",
             "solution": "Changed render mode to World Space and also adjusted canvas position",
+            "codeSnippet": "",
             "createdAt": "2026-05-12 10:15:56"
         },
         {
@@ -16,6 +17,7 @@
             "tags": "XR,Optimization",
             "problem": "Controller tracking jitter",
             "solution": "Reduced update polling frequency",
+            "codeSnippet": "",
             "createdAt": "2026-05-13 09:29:40"
         },
         {
@@ -25,6 +27,7 @@
             "tags": "XR,HandTracking",
             "problem": "Delayed hand response during movement",
             "solution": "Optimized hand tracking update loop",
+            "codeSnippet": "",
             "createdAt": "2026-05-13 10:05:12"
         },
         {
@@ -34,6 +37,7 @@
             "tags": "XR,Audio",
             "problem": "Spatial audio distortion in headset",
             "solution": "Adjusted audio spatial blend settings",
+            "codeSnippet": "",
             "createdAt": "2026-05-13 10:22:34"
         },
         {
@@ -43,6 +47,7 @@
             "tags": "XR,FPS,Optimization",
             "problem": "Frame drops in dense environments",
             "solution": "Reduced real-time lighting and shadows",
+            "codeSnippet": "",
             "createdAt": "2026-05-13 10:45:08"
         },
         {
@@ -52,6 +57,7 @@
             "tags": "XR,Locomotion",
             "problem": "Teleport ray not detecting surfaces",
             "solution": "Updated interaction layer masks",
+            "codeSnippet": "",
             "createdAt": "2026-05-13 11:02:17"
         },
         {
@@ -61,6 +67,7 @@
             "tags": "XR,UI,Input",
             "problem": "XR ray interactor not triggering button",
             "solution": "Enabled graphic raycaster component",
+            "codeSnippet": "",
             "createdAt": "2026-05-13 11:18:55"
         },
         {
@@ -70,6 +77,7 @@
             "tags": "XR,Tracking",
             "problem": "Camera slowly drifting during runtime",
             "solution": "Recalibrated tracking origin mode",
+            "codeSnippet": "",
             "createdAt": "2026-05-13 11:37:41"
         },
         {
@@ -79,6 +87,7 @@
             "tags": "XR,Loading",
             "problem": "Application freezing during scene transition",
             "solution": "Implemented async scene loading",
+            "codeSnippet": "",
             "createdAt": "2026-05-13 11:58:09"
         },
         {
@@ -88,6 +97,7 @@
             "tags": "XR,Haptics",
             "problem": "Haptic feedback not triggering",
             "solution": "Updated XR input action bindings",
+            "codeSnippet": "",
             "createdAt": "2026-05-13 12:16:44"
         },
         {
@@ -97,6 +107,7 @@
             "tags": "XR, VR UI",
             "problem": "Unity VR UI Buttons not working",
             "solution": "Set Canvas to World Space, add Tracked device Graphic Raycaster and use XR UI Input Module.",
+            "codeSnippet": "",
             "createdAt": "2026-05-18 10:21:14"
         },
         {
@@ -106,7 +117,18 @@
             "tags": "XR, Controller, Input",
             "problem": "Controller not detected",
             "solution": "Restart XR Interaction Toolkit",
+            "codeSnippet": "",
             "createdAt": "2026-05-29 10:19:54"
+        },
+        {
+            "id": "KB-0013",
+            "title": "XR Hand Tracking Jitter",
+            "category": "XR",
+            "tags": "xr,tracking,handtracking,performance",
+            "problem": "Hand tracking becomes unstable and jittery during rapid hand movement in XR scenes.",
+            "solution": "Reduced tracking sensitivity, optimized update frequency, and enabled smoothing filters for hand pose stabilization.",
+            "codeSnippet": "handTrackingProvider.smoothing = true;\r\nhandTrackingProvider.updateRate = 60;",
+            "createdAt": "2026-06-02 15:32:15"
         }
     ]
 }
