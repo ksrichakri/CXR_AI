@@ -17,7 +17,7 @@ public class KnowledgeAssistantWindow : EditorWindow
     private string codeSnippet = "";
     private string filePath;
     private const string API_URL =
-        "http://127.0.0.1:8000/query";
+        "http://172.17.31.36:8000/query";
 
     private bool sendToBackend = true;
     [MenuItem("Tools/Knowledge Assistant")]
@@ -97,13 +97,10 @@ public class KnowledgeAssistantWindow : EditorWindow
             }
         }
 
-        // GENERATE UNIQUE ID
-        string generatedID = GenerateID(entries.Count);
 
         // CREATE NEW ENTRY
         Entry newEntry = new Entry()
         {
-            id = generatedID,
             title = entryTitle,
             category = category,
             tags = tags,
@@ -129,7 +126,9 @@ public class KnowledgeAssistantWindow : EditorWindow
         // REFRESH UNITY
         AssetDatabase.Refresh();
 
-        Debug.Log($"Knowledge Entry Saved: {generatedID}");
+        Debug.Log(
+            "Knowledge Entry Saved Successfully"
+        );
 
         if (sendToBackend)
         {
@@ -249,8 +248,6 @@ public class KnowledgeAssistantWindow : EditorWindow
     [System.Serializable]
     public class Entry
     {
-        public string id;
-
         public string title;
 
         public string category;
