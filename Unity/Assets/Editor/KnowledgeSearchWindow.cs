@@ -333,7 +333,7 @@ public class KnowledgeSearchWindow : EditorWindow
 
         UnityWebRequest webRequest =
             new UnityWebRequest(
-                "http://127.0.0.1:8000/search",
+                "http://172.17.31.36:8000/search",
                 "POST"
             );
 

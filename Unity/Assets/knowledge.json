@@ -1,7 +1,6 @@
 {
     "entries": [
         {
-            "id": "KB-0001",
             "title": "XR UI Flickering",
             "category": "UI",
             "tags": "XR,UI",
@@ -11,7 +10,6 @@
             "createdAt": "2026-05-12 10:15:56"
         },
         {
-            "id": "KB-0002",
             "title": "XR Controller Lag",
             "category": "Performance",
             "tags": "XR,Optimization",
@@ -21,7 +19,6 @@
             "createdAt": "2026-05-13 09:29:40"
         },
         {
-            "id": "KB-0003",
             "title": "Hand Tracking Delay",
             "category": "Tracking",
             "tags": "XR,HandTracking",
@@ -31,7 +28,6 @@
             "createdAt": "2026-05-13 10:05:12"
         },
         {
-            "id": "KB-0004",
             "title": "VR Audio Distortion",
             "category": "Audio",
             "tags": "XR,Audio",
@@ -41,7 +37,6 @@
             "createdAt": "2026-05-13 10:22:34"
         },
         {
-            "id": "KB-0005",
             "title": "Low FPS in XR Scene",
             "category": "Performance",
             "tags": "XR,FPS,Optimization",
@@ -51,7 +46,6 @@
             "createdAt": "2026-05-13 10:45:08"
         },
         {
-            "id": "KB-0006",
             "title": "Teleportation Not Working",
             "category": "Gameplay",
             "tags": "XR,Locomotion",
@@ -61,7 +55,6 @@
             "createdAt": "2026-05-13 11:02:17"
         },
         {
-            "id": "KB-0007",
             "title": "UI Button Not Clickable",
             "category": "UI",
             "tags": "XR,UI,Input",
@@ -71,7 +64,6 @@
             "createdAt": "2026-05-13 11:18:55"
         },
         {
-            "id": "KB-0008",
             "title": "Headset Rotation Drift",
             "category": "Tracking",
             "tags": "XR,Tracking",
@@ -81,7 +73,6 @@
             "createdAt": "2026-05-13 11:37:41"
         },
         {
-            "id": "KB-0009",
             "title": "Scene Loading Freeze",
             "category": "Performance",
             "tags": "XR,Loading",
@@ -91,7 +82,6 @@
             "createdAt": "2026-05-13 11:58:09"
         },
         {
-            "id": "KB-0010",
             "title": "Controller Vibration Missing",
             "category": "Input",
             "tags": "XR,Haptics",
@@ -101,7 +91,6 @@
             "createdAt": "2026-05-13 12:16:44"
         },
         {
-            "id": "KB-0011",
             "title": "UI Button not visible and working properly",
             "category": "XR, Interaction Toolkit",
             "tags": "XR, VR UI",
@@ -111,7 +100,6 @@
             "createdAt": "2026-05-18 10:21:14"
         },
         {
-            "id": "KB-0012",
             "title": "XR Controller Bug ",
             "category": "XR",
             "tags": "XR, Controller, Input",
@@ -121,7 +109,6 @@
             "createdAt": "2026-05-29 10:19:54"
         },
         {
-            "id": "KB-0013",
             "title": "XR Hand Tracking Jitter",
             "category": "XR",
             "tags": "xr,tracking,handtracking,performance",
@@ -129,6 +116,33 @@
             "solution": "Reduced tracking sensitivity, optimized update frequency, and enabled smoothing filters for hand pose stabilization.",
             "codeSnippet": "handTrackingProvider.smoothing = true;\r\nhandTrackingProvider.updateRate = 60;",
             "createdAt": "2026-06-02 15:32:15"
+        },
+        {
+            "title": "Objects not placed properly in VR Environment",
+            "category": "VR,UI, Scene",
+            "tags": "VR, Scenes",
+            "problem": "So the objects are not staying properly in the space",
+            "solution": "Fix the scaling and positions",
+            "codeSnippet": "",
+            "createdAt": "2026-06-05 15:08:17"
+        },
+        {
+            "title": "Objects not placed properly in VR Environment",
+            "category": "VR,UI, Scene",
+            "tags": "VR, Scenes,Environment",
+            "problem": "So the objects are not staying properly in the space(environment)",
+            "solution": "Fix the scaling and positions",
+            "codeSnippet": "",
+            "createdAt": "2026-06-05 15:18:55"
+        },
+        {
+            "title": "Objects not placed properly in VR Environment",
+            "category": "VR,UI, Scene",
+            "tags": "VR, Scenes,Environment",
+            "problem": "So the objects are not staying properly in the space(environment)",
+            "solution": "Fix the scaling and positions",
+            "codeSnippet": "",
+            "createdAt": "2026-06-05 15:25:17"
         }
     ]
 }
