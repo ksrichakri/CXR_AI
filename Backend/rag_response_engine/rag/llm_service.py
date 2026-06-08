@@ -46,44 +46,6 @@ class OllamaService(BaseLLMService):
         )
         return response["message"]["content"]
 
-class OpenAIService(BaseLLMService):
-    def __init__(self, model_name: str, temperature: float = 0.2):
-        self.model_name = model_name
-        self.temperature = temperature
-
-    def generate(self, prompt: str, system_prompt: str = None) -> str:
-        try:
-            import openai
-        except ImportError:
-            raise ImportError(
-                "The 'openai' library is required to use the OpenAI provider. "
-                "Please run `pip install openai` to enable it."
-            )
-        
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise ValueError("OPENAI_API_KEY environment variable is not set.")
-        
-        client = openai.OpenAI(api_key=api_key)
-        
-        messages = []
-        if system_prompt:
-            messages.append({
-                "role": "system",
-                "content": system_prompt
-            })
-        messages.append({
-            "role": "user",
-            "content": prompt
-        })
-        
-        response = client.chat.completions.create(
-            model=self.model_name,
-            messages=messages,
-            temperature=self.temperature
-        )
-        return response.choices[0].message.content
-
 class LLMServiceFactory:
     @staticmethod
     def get_service() -> BaseLLMService:
@@ -94,10 +56,8 @@ class LLMServiceFactory:
         if provider == "ollama":
             num_ctx = int(os.getenv("LLM_NUM_CTX", "8192"))
             return OllamaService(model_name=model, num_ctx=num_ctx, temperature=temperature)
-        elif provider == "openai":
-            return OpenAIService(model_name=model, temperature=temperature)
         else:
-            raise ValueError(f"Unsupported LLM provider: {provider}")
+            raise ValueError(f"Unsupported local LLM provider: {provider} (only 'ollama' is supported)")
 
 def generate_response(prompt, system_prompt=None):
     if system_prompt is None:
