@@ -97,5 +97,6 @@ def run_rag(question, retrieved_docs=None):
     answer = generate_response(prompt)
     
     return {
+        "question":question,
         "answer": answer
     }

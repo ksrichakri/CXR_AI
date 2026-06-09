@@ -36,6 +36,9 @@ class EntryResponse(BaseModel):
         default_factory=list
     )
     
+    gen_answer: str = Field(
+        default= "Answer"
+    )
     class Config:
         from_attributes = True
 
