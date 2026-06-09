@@ -2,12 +2,13 @@ from fastapi import FastAPI,Depends,HTTPException
 from Backend.models.kbEntry import Entry
 from Backend.database.connection import SessionLocal,engine,Base
 from Backend.models.kbEntry_db import Entry_Model
-from Backend.models.kbEntry import Entry
 from Backend.models.searchQuery import SearchQuery
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from Backend.semantic_search_engine.app.embedder import generate_embedding
-from Backend.models.response import EntryResponse
+from Backend.models.response import EntryResponse, SearchResponse
+from Backend.rag_response_engine.rag.rag_pipeline import run_rag
+
 app = FastAPI()
 Base.metadata.create_all(bind = engine)
 
@@ -88,15 +89,32 @@ def delete_query(id:int , db: Session = Depends(db_con)):
             detail="Entry not found"
         )
 
-@app.post("/search",response_model=list[EntryResponse])
+@app.post("/search",response_model=SearchResponse)
 def sem_search(search_query: SearchQuery, db:Session = Depends(db_con)):
-    
     query_embedding = generate_embedding(search_query.query)
-    
     results = db.query(
         Entry_Model,
         (Entry_Model.embedding.cosine_distance(query_embedding)).label('similarity')
     ).order_by('similarity').limit(2)
-    
-    return [result[0] for result in results]
+
+    retrieved_entries = []
+    retrieved_docs = []
+
+    for entry, _similarity in results:
+        retrieved_entries.append(entry)
+        retrieved_docs.append(
+            f"Title: {entry.title}\n"
+            f"Category: {entry.category}\n"
+            f"Problem: {entry.problem}\n"
+            f"Solution: {entry.solution}\n"
+            f"Code Snippet: {entry.codeSnippet or ''}\n"
+            f"Tags: {', '.join(entry.tags or [])}"
+        )
+
+    rag_response = run_rag(search_query.query, retrieved_docs)
+
+    return {
+        "results": retrieved_entries,
+        "rag_response": rag_response,
+    }
     

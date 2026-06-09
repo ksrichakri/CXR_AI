@@ -36,8 +36,23 @@ class EntryResponse(BaseModel):
         default_factory=list
     )
     
-    gen_answer: str = Field(
-        default= "Answer"
-    )
     class Config:
         from_attributes = True
+
+
+class RAGResponse(BaseModel):
+
+    question: str = Field(...)
+
+    answer: str = Field(...)
+
+    # sources_count: int = Field(..., ge=0)
+
+    # retrieved_context: List[str] = Field(default_factory=list)
+
+
+class SearchResponse(BaseModel):
+
+    results: List[EntryResponse] = Field(default_factory=list)
+
+    rag_response: RAGResponse = Field(...)

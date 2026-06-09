@@ -138,7 +138,7 @@ curl -X DELETE http://localhost:8000/query/123
 
 ### POST /search
 
-Semantic search across knowledge base entries using vector similarity.
+Semantic search across knowledge base entries using vector similarity, plus a grounded RAG answer built from the matched entries.
 
 **Request Body:**
 
@@ -149,12 +149,13 @@ Semantic search across knowledge base entries using vector similarity.
 
 1. Generates semantic embedding from the search query
 2. Queries the database using cosine similarity (pgvector)
-3. Returns all entries sorted by relevance (most similar first)
+3. Builds RAG context from the matched entries
+4. Generates an answer with the local RAG pipeline
 
 **Response:**
 
-- Type: `list[EntryResponse]`
-- Returns list of entries ranked by similarity to query.
+- Type: `SearchResponse`
+- Returns the matched entries and a grounded RAG response.
 
 **Example:**
 
