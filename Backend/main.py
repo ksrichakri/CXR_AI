@@ -51,9 +51,11 @@ def add_kb(entry:Entry,db:Session = Depends(db_con)):
         db.refresh(db_entry)
         return db_entry
     
-    except IntegrityError:
+    except IntegrityError as e :
         db.rollback()
-        raise HTTPException
+        raise HTTPException(status_code = 500,
+                            detail = str(e.orig)
+                            )
 
 @app.put("/query/{id}",response_model=EntryResponse)
 def update_kb(id:int,entry:Entry,db:Session = Depends(db_con)):
@@ -117,4 +119,3 @@ def sem_search(search_query: SearchQuery, db:Session = Depends(db_con)):
         "results": retrieved_entries,
         "rag_response": rag_response,
     }
-    
